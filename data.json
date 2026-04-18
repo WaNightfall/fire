@@ -1,0 +1,252 @@
+{
+  "report_date": "2026-04-17",
+  "data_source": "USGS HVO · 2026-04-17 15:21 HST",
+  "source_url": "https://volcanoes.usgs.gov/hans-public/notice/DOI-USGS-HVO-2026-04-16T18:16:21+00:00",
+  "alert_level": "ADVISORY",
+  "aviation_code": "YELLOW",
+  "telemetry_status": "NORMAL",
+  "episode_window_badge": "第45次窗口 4/20–4/25",
+  "metrics": [
+    {
+      "id": 1,
+      "title": "① 地倾斜",
+      "status": "red",
+      "value": "+10.1 μrad",
+      "progress": 57,
+      "lines": [
+        "UWD 自4/9后累计回弹",
+        "充能约57%（10.1/17.6）",
+        "HVO 窗口 4/20–4/25"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "② 地震震颤",
+      "status": "amber",
+      "value": "~10 min/脉冲",
+      "progress": 32,
+      "lines": [
+        "气体活塞相关脉冲",
+        "北/南喷口均有关联",
+        "未见连续异常震颤"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "③ SO₂ 排放",
+      "status": "green",
+      "value": "~1–5k t/d",
+      "progress": 15,
+      "lines": [
+        "间歇期正常范围",
+        "东裂谷低于检测限",
+        "南喷口脱气活跃"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "④ 摄像头",
+      "status": "red",
+      "value": "剧烈持续火焰",
+      "progress": 85,
+      "lines": [
+        "南喷口：整夜辉光+数段剧烈火焰",
+        "北喷口：持续出气，无辉光",
+        "HVO：intense flaming，临发强信号"
+      ]
+    }
+  ],
+  "change_alert": {
+    "has_changes": true,
+    "items": [
+      {
+        "icon": "▲",
+        "highlight": "预测窗口起始后移为 4/20",
+        "detail": "昨日 4/19–4/25 → 今日 4/20–4/25，HVO 依最新膨胀速率重新建模"
+      },
+      {
+        "icon": "▲",
+        "highlight": "南喷口火焰升级为剧烈持续",
+        "detail": "HVO 原文：prolonged periods of intense flaming，整夜多段出现，较昨日明显增强"
+      },
+      {
+        "icon": "▲",
+        "highlight": "倾斜回弹量确认为 10.1 μrad",
+        "detail": "UWD 首次给出精确数值，充能进度约57%，速率符合窗口建模预期"
+      }
+    ]
+  },
+  "chart": {
+    "start_date": "2026-04-17",
+    "days": 30,
+    "hvo_window": {
+      "start_index": 3,
+      "end_index": 8,
+      "label": "HVO官方窗口"
+    },
+    "data": [
+      {
+        "date": "4/17",
+        "probability": 19,
+        "confidence": 80
+      },
+      {
+        "date": "4/18",
+        "probability": 18,
+        "confidence": 78
+      },
+      {
+        "date": "4/19",
+        "probability": 16,
+        "confidence": 75
+      },
+      {
+        "date": "4/20",
+        "probability": 15,
+        "confidence": 73
+      },
+      {
+        "date": "4/21",
+        "probability": 13,
+        "confidence": 71
+      },
+      {
+        "date": "4/22",
+        "probability": 12,
+        "confidence": 68
+      },
+      {
+        "date": "4/23",
+        "probability": 11,
+        "confidence": 66
+      },
+      {
+        "date": "4/24",
+        "probability": 10,
+        "confidence": 64
+      },
+      {
+        "date": "4/25",
+        "probability": 9,
+        "confidence": 62
+      },
+      {
+        "date": "4/26",
+        "probability": 8,
+        "confidence": 59
+      },
+      {
+        "date": "4/27",
+        "probability": 7,
+        "confidence": 57
+      },
+      {
+        "date": "4/28",
+        "probability": 6,
+        "confidence": 55
+      },
+      {
+        "date": "4/29",
+        "probability": 6,
+        "confidence": 52
+      },
+      {
+        "date": "4/30",
+        "probability": 5,
+        "confidence": 50
+      },
+      {
+        "date": "5/1",
+        "probability": 5,
+        "confidence": 48
+      },
+      {
+        "date": "5/2",
+        "probability": 4,
+        "confidence": 46
+      },
+      {
+        "date": "5/3",
+        "probability": 3,
+        "confidence": 43
+      },
+      {
+        "date": "5/4",
+        "probability": 3,
+        "confidence": 41
+      },
+      {
+        "date": "5/5",
+        "probability": 3,
+        "confidence": 39
+      },
+      {
+        "date": "5/6",
+        "probability": 2,
+        "confidence": 36
+      },
+      {
+        "date": "5/7",
+        "probability": 2,
+        "confidence": 34
+      },
+      {
+        "date": "5/8",
+        "probability": 2,
+        "confidence": 32
+      },
+      {
+        "date": "5/9",
+        "probability": 1,
+        "confidence": 29
+      },
+      {
+        "date": "5/10",
+        "probability": 1,
+        "confidence": 27
+      },
+      {
+        "date": "5/11",
+        "probability": 1,
+        "confidence": 25
+      },
+      {
+        "date": "5/12",
+        "probability": 0,
+        "confidence": 23
+      },
+      {
+        "date": "5/13",
+        "probability": 0,
+        "confidence": 20
+      },
+      {
+        "date": "5/14",
+        "probability": 0,
+        "confidence": 18
+      },
+      {
+        "date": "5/15",
+        "probability": 0,
+        "confidence": 16
+      },
+      {
+        "date": "5/16",
+        "probability": 0,
+        "confidence": 13
+      }
+    ]
+  },
+  "stats": {
+    "hvo_window": "4/20–4/25",
+    "days_since_last": 116,
+    "days_to_window": 3,
+    "network_status": "全面在线"
+  },
+  "travel_alert": {
+    "urgency": "prepare",
+    "color": "orange",
+    "message": "南喷口整夜出现剧烈持续火焰（intense flaming），是本轮最强前驱信号。HVO官方窗口为4/20–4/25，前驱溢流预计数天内开始。建议现在订好4/18–4/19抵达夏威夷岛的机票，住 Volcano Village。一旦 HVO 日报出现「precursory overflows began」立即出发。"
+  },
+  "footnote": "SDH 倾斜仪仍因 tephra 覆盖离线。窗口 4/20–4/25 为 USGS HVO 官方建模结果（April 16, 09:00 HST）。概率曲线为统计推断，非官方预报。充能进度基于 UWD 数据估算。"
+}
