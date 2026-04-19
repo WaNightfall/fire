@@ -1,6 +1,6 @@
 {
-  "report_date": "2026-04-17",
-  "data_source": "USGS HVO · 2026-04-17 15:21 HST",
+  "report_date": "2026-04-18",
+  "data_source": "USGS HVO · 2026-04-18 16:59 HST",
   "source_url": "https://volcanoes.usgs.gov/hans-public/notice/DOI-USGS-HVO-2026-04-16T18:16:21+00:00",
   "alert_level": "ADVISORY",
   "aviation_code": "YELLOW",
@@ -239,7 +239,7 @@
   },
   "stats": {
     "hvo_window": "4/20–4/25",
-    "days_since_last": 116,
+    "days_since_last": 10,
     "days_to_window": 3,
     "network_status": "全面在线"
   },

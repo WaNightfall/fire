@@ -605,6 +605,58 @@
   @media (max-width: 600px) {
     .info-grid { grid-template-columns: 1fr; }
   }
+
+  /* ── MOBILE ── */
+  @media (max-width: 640px) {
+    .container { padding: 14px 12px 48px; }
+
+    /* header stacks */
+    .header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 16px 0 14px; margin-bottom: 20px; }
+    .header-right { align-items: flex-start; width: 100%; }
+    .badges { justify-content: flex-start; gap: 6px; }
+    .volcano-name { font-size: 17px; }
+    .data-source { font-size: 10px; }
+    .refresh-row { margin-top: 2px; }
+
+    /* metrics */
+    .metric-value { font-size: 15px; }
+    .metric-card { padding: 12px; }
+
+    /* chart shorter */
+    .chart-wrap { height: 190px; }
+
+    /* stats */
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-value { font-size: 18px; }
+    .stat-card { padding: 11px 12px; }
+
+    /* travel alert */
+    .travel-alert { gap: 10px; padding: 12px 14px; }
+    .travel-icon { font-size: 17px; }
+    .travel-message { font-size: 11px; }
+
+    /* change alert */
+    .change-alert { padding: 12px 14px; }
+
+    /* section label */
+    .section-label { font-size: 9px; }
+
+    /* supplement panels */
+    .panel-trigger { padding: 12px; gap: 10px; font-size: 12px; }
+    .panel-subtitle { font-size: 9px; display: none; }
+
+    /* scroll containers for wide tables */
+    .panel-inner { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .lifecycle-table { min-width: 480px; }
+    .obs-timeline { min-width: 460px; }
+    .history-table { min-width: 520px; }
+    .history-summary { grid-template-columns: 1fr; }
+    .timeline-tips { grid-template-columns: repeat(2, 1fr); }
+
+    /* footnote */
+    .footnote { font-size: 9px; }
+    .supplements-section { margin-top: 28px; }
+  }
 </style>
 </head>
 <body>
@@ -1068,7 +1120,7 @@ function renderAll(data) {
   renderMetrics(data.metrics);
   renderChangeAlert(data.change_alert);
   renderChart(data.chart);
-  renderStats(data.stats);
+  renderStats(data);
   renderTravelAlert(data.travel_alert);
   renderFootnote(data.footnote);
 }
@@ -1298,11 +1350,23 @@ function renderChart(cfg) {
 // ─────────────────────────────────────────────
 // RENDER: STATS
 // ─────────────────────────────────────────────
-function renderStats(stats) {
+function renderStats(data) {
+  const stats = data.stats;
+
+  // 动态计算，避免读取 data.json 中的过期静态值
+  const LAST_ERUPTION = new Date(2026, 3, 9); // 第44次：2026-04-09
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const daysSinceLast = Math.floor((today - LAST_ERUPTION) / 86400000);
+
+  const win = parseWindowBadge(data.episode_window_badge, today.getFullYear());
+  const daysToWindow = win
+    ? (today >= win.start ? 0 : Math.floor((win.start - today) / 86400000))
+    : null;
+
   const cards = [
     { label: 'HVO 官方窗口',  value: stats.hvo_window || '——',     sub: '第45次喷发',           highlight: !!stats.hvo_window },
-    { label: '间歇第几天',    value: '第 ' + stats.days_since_last + ' 天', sub: '自上次喷发结束', highlight: false },
-    { label: '窗口倒计时',    value: stats.days_to_window != null ? stats.days_to_window + ' 天' : '——', sub: '距官方窗口开启', highlight: stats.days_to_window <= 3 },
+    { label: '间歇第几天',    value: '第 ' + daysSinceLast + ' 天', sub: '自第44次喷发结束',    highlight: false },
+    { label: '窗口倒计时',    value: daysToWindow != null ? daysToWindow + ' 天' : '——', sub: '距官方窗口开启', highlight: daysToWindow !== null && daysToWindow <= 3 },
     { label: '监测网络',      value: stats.network_status,            sub: 'SDH 仍离线除外',       highlight: false }
   ];
 
