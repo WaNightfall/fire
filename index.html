@@ -657,6 +657,26 @@
     .footnote { font-size: 9px; }
     .supplements-section { margin-top: 28px; }
   }
+
+  /* ── WEBCAM LINKS ── */
+  .webcam-links { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
+  .webcam-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 12px 16px;
+    color: var(--text2);
+    text-decoration: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .webcam-link:hover { border-color: var(--lava); color: var(--lava2); background: var(--lava-dim); }
+  .wl-icon { color: var(--lava); font-size: 11px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -688,9 +708,6 @@
   <div class="section-label">监测指标</div>
   <div class="metrics-grid" id="metrics-grid"></div>
 
-  <!-- CHANGE ALERT -->
-  <div id="change-alert-container"></div>
-
   <!-- CHART -->
   <div class="section-label">未来30天概率预测</div>
   <div class="chart-section">
@@ -713,6 +730,26 @@
   <!-- TRAVEL ALERT -->
   <div class="section-label">出行建议</div>
   <div id="travel-alert-container"></div>
+
+  <!-- WEBCAM -->
+  <div class="section-label">实时摄像头</div>
+  <div class="webcam-links">
+    <a class="webcam-link" href="https://www.youtube.com/watch?v=NDA9Bsvjwdk" target="_blank" rel="noopener">
+      <span class="wl-icon">▶</span>
+      <span class="wl-text">直播频道 1 · YouTube ↗</span>
+    </a>
+    <a class="webcam-link" href="https://www.youtube.com/watch?v=Tz5tPqRRv1Y" target="_blank" rel="noopener">
+      <span class="wl-icon">▶</span>
+      <span class="wl-text">直播频道 2 · YouTube ↗</span>
+    </a>
+    <a class="webcam-link" href="https://www.youtube.com/watch?v=gXKuUyKt8mc" target="_blank" rel="noopener">
+      <span class="wl-icon">▶</span>
+      <span class="wl-text">直播频道 3 · YouTube ↗</span>
+    </a>
+  </div>
+
+  <!-- CHANGE ALERT -->
+  <div id="change-alert-container"></div>
 
   <!-- FOOTNOTE -->
   <div class="footnote" id="footnote"></div>
@@ -940,17 +977,38 @@ const STAGE = {
 };
 
 function detectStage(data) {
-  const cam = data.metrics && data.metrics[3];
-  if (!cam) return STAGE.EARLY_INFLATION;
+  const metrics = data.metrics;
+  if (!metrics || metrics.length < 4) return STAGE.EARLY_INFLATION;
+
+  // 通用信号分：status权重0.5 + progress权重0.5
+  const sMap = { red: 1.0, amber: 0.6, green: 0.2 };
+  const sig = m => (sMap[m.status] || 0.3) * 0.5 + (m.progress / 100) * 0.5;
+
+  // 摄像头：关键词覆盖，比单纯status+progress更精确
+  const cam = metrics[3];
   const camText = [cam.value, ...(cam.lines || [])].join(' ').toLowerCase();
-  if (camText.includes('precursory overflows') || camText.includes('前驱溢流'))
-    return STAGE.PRECURSORY_OVERFLOWS;
-  if (camText.includes('intense flaming') || camText.includes('剧烈持续火焰'))
-    return STAGE.ACTIVE_PRECURSORY;
-  if ((camText.includes('辉光') || camText.includes('glow')) &&
-      (camText.includes('火焰') || camText.includes('flame')))
-    return STAGE.ACTIVE_PRECURSORY;
-  if (cam.status === 'green') return STAGE.EARLY_INFLATION;
+  let camSig;
+  if (camText.includes('precursory overflows') || camText.includes('前驱溢流')) {
+    camSig = 0.95;
+  } else if (camText.includes('intense flaming') || camText.includes('剧烈持续火焰')) {
+    camSig = 0.85;
+  } else if ((camText.includes('辉光') || camText.includes('glow')) &&
+             (camText.includes('火焰') || camText.includes('flame'))) {
+    camSig = 0.70;
+  } else {
+    camSig = sig(cam);
+  }
+
+  // 四信号加权：倾斜40% · 震颤25% · SO₂15% · 摄像头20%
+  const score = sig(metrics[0]) * 0.40
+              + sig(metrics[1]) * 0.25
+              + sig(metrics[2]) * 0.15
+              + camSig          * 0.20;
+
+  // 阶段映射
+  if (score > 0.82) return STAGE.IMMINENT;
+  if (score > 0.65) return STAGE.PRECURSORY_OVERFLOWS;
+  if (score > 0.45) return STAGE.ACTIVE_PRECURSORY;
   return STAGE.EARLY_INFLATION;
 }
 
@@ -1118,10 +1176,10 @@ function highlightChanges(fields) {
 function renderAll(data) {
   renderHeader(data);
   renderMetrics(data.metrics);
-  renderChangeAlert(data.change_alert);
   renderChart(data.chart);
   renderStats(data);
   renderTravelAlert(data.travel_alert);
+  renderChangeAlert(data.change_alert);
   renderFootnote(data.footnote);
 }
 
@@ -1437,6 +1495,7 @@ function showToast(msg, type = '') {
 function togglePanel(btn) {
   btn.closest('.supplement-panel').classList.toggle('open');
 }
+
 </script>
 </body>
 </html>
