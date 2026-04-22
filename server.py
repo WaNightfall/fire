@@ -53,7 +53,7 @@ def api_refresh():
         result = run_prediction(eq_data, status_data, alerts_data)
 
         current = json.loads(DATA_JSON.read_text(encoding="utf-8"))
-        _patch(current, result)
+        _patch(current, result, status_data)
 
         DATA_JSON.write_text(
             json.dumps(current, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -70,7 +70,7 @@ def api_refresh():
         return jsonify({"error": str(e)}), 500
 
 
-def _patch(data: dict, result: dict) -> None:
+def _patch(data: dict, result: dict, status_data: dict = None) -> None:
     """只更新可由 USGS API 可靠获取的字段，人工维护字段（chart、metrics、窗口等）保持不变。"""
     now = datetime.now(HST)
     data["report_date"]   = now.strftime("%Y-%m-%d")
@@ -79,6 +79,9 @@ def _patch(data: dict, result: dict) -> None:
     data["aviation_code"] = result["aviation_color"]
     last_eruption = datetime(2026, 4, 9, tzinfo=timezone.utc)
     data["stats"]["days_since_last"] = (datetime.now(timezone.utc) - last_eruption).days
+    # 自动更新原始日报链接
+    if status_data and status_data.get("notice_url"):
+        data["source_url"] = status_data["notice_url"]
 
 
 if __name__ == "__main__":

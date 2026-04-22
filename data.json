@@ -1,9 +1,9 @@
 {
-  "report_date": "2026-04-19",
-  "data_source": "USGS HVO · 2026-04-19 00:54 HST",
-  "source_url": "https://volcanoes.usgs.gov/hans-public/notice/DOI-USGS-HVO-2026-04-16T18:16:21+00:00",
-  "alert_level": "ADVISORY",
-  "aviation_code": "YELLOW",
+  "report_date": "2026-04-21",
+  "data_source": "USGS HVO · 2026-04-21 14:20 HST",
+  "source_url": "https://volcanoes.usgs.gov/hans-public/notice/DOI-USGS-HVO-2026-04-21T18:14:55+00:00",
+  "alert_level": "WATCH",
+  "aviation_code": "ORANGE",
   "telemetry_status": "NORMAL",
   "episode_window_badge": "第45次窗口 4/20–4/25",
   "metrics": [
@@ -239,7 +239,7 @@
   },
   "stats": {
     "hvo_window": "4/20–4/25",
-    "days_since_last": 10,
+    "days_since_last": 13,
     "days_to_window": 3,
     "network_status": "全面在线"
   },
