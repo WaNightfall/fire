@@ -1442,7 +1442,7 @@ function renderStats(data) {
 // ─────────────────────────────────────────────
 function renderTravelAlert(alert) {
   const icons   = { watch: '◈', prepare: '◉', go_now: '⬤' };
-  const titles  = { watch: '持续观望', prepare: '准备出发', go_now: '立即出发！' };
+  const titles  = { watch: '持续观望', prepare: '准备出发', go_now: '尽快出发 / 优先前往' };
 
   document.getElementById('travel-alert-container').innerHTML = `
     <div class="travel-alert ${alert.urgency}" id="travel_alert" style="margin-bottom:28px">
