@@ -19,7 +19,7 @@ from flask import Flask, jsonify, send_from_directory
 PREDICT_DIR = Path(__file__).parent.parent / "火山预测"
 sys.path.insert(0, str(PREDICT_DIR))
 from fetch_data import fetch_all
-from predict import run_prediction
+from predict import run_prediction, parse_daily_changes
 
 BASE = Path(__file__).parent
 DATA_JSON = BASE / "data.json"
@@ -53,7 +53,7 @@ def api_refresh():
         result = run_prediction(eq_data, status_data, alerts_data)
 
         current = json.loads(DATA_JSON.read_text(encoding="utf-8"))
-        _patch(current, result, status_data)
+        _patch(current, result, status_data, alerts_data)
 
         DATA_JSON.write_text(
             json.dumps(current, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -70,7 +70,7 @@ def api_refresh():
         return jsonify({"error": str(e)}), 500
 
 
-def _patch(data: dict, result: dict, status_data: dict = None) -> None:
+def _patch(data: dict, result: dict, status_data: dict = None, alerts_data: list = None) -> None:
     """只更新可由 USGS API 可靠获取的字段，人工维护字段（chart、metrics、窗口等）保持不变。"""
     now = datetime.now(HST)
     data["report_date"]   = now.strftime("%Y-%m-%d")
@@ -82,6 +82,12 @@ def _patch(data: dict, result: dict, status_data: dict = None) -> None:
     # 自动更新原始日报链接
     if status_data and status_data.get("notice_url"):
         data["source_url"] = status_data["notice_url"]
+    # 从最新通报解析今日重要变化
+    if alerts_data:
+        changes = parse_daily_changes(alerts_data)
+        if changes.get("has_changes"):
+            data["change_alert"] = changes
+            log.info(f"今日变化已更新：{len(changes['items'])} 条")
 
 
 if __name__ == "__main__":
