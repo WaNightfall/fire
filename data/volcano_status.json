@@ -1,0 +1,11 @@
+{
+  "fetched_at": "2026-04-23T01:16:57.167729+00:00",
+  "source_url": "https://volcanoes.usgs.gov/hans-public/api/volcano/getMonitoredVolcanoes",
+  "data": {
+    "alert_level": "WATCH",
+    "aviation_color": "ORANGE",
+    "volcano_name": "Kilauea",
+    "last_updated": "2026-04-22 18:58:55",
+    "notice_url": "https://volcanoes.usgs.gov/hans-public/notice/DOI-USGS-HVO-2026-04-22T17:23:37+00:00"
+  }
+}
