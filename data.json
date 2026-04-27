@@ -1,34 +1,34 @@
 {
-  "report_date": "2026-04-22",
-  "data_source": "USGS HVO · April 22, 2026, 15:17 HST",
-  "source_url": "https://volcanoes.usgs.gov/hans-public/notice/DOI-USGS-HVO-2026-04-22T17:23:37+00:00",
-  "alert_level": "WATCH",
-  "aviation_code": "ORANGE",
-  "telemetry_status": "PARTIAL",
-  "episode_window_badge": "第45次窗口 4/22–4/26",
+  "report_date": "2026-04-26",
+  "data_source": "USGS HVO · April 26, 2026, 08:47 HST",
+  "source_url": "https://volcanoes.usgs.gov/hans-public/notice/DOI-USGS-HVO-2026-04-26T18:28:53+00:00",
+  "alert_level": "ADVISORY",
+  "aviation_code": "YELLOW",
+  "telemetry_status": "NORMAL",
+  "episode_window_badge": "第46次窗口 5月初（待发布）",
   "metrics": [
     {
       "id": 1,
       "title": "① 地倾斜",
-      "status": "red",
-      "value": "+17.3 μrad",
-      "progress": 98,
+      "status": "green",
+      "value": "新轮充能中",
+      "progress": 5,
       "lines": [
-        "UWD 自4/9后累计回弹",
-        "充能约98%（17.3/17.6），近满载",
-        "24h新增 +0.8 μrad"
+        "第45次喷发已于4月23日结束",
+        "深度间歇期初期，充能仅5%",
+        "膨胀速率缓慢恢复"
       ]
     },
     {
       "id": 2,
       "title": "② 地震震颤",
-      "status": "amber",
-      "value": "14次/24h",
-      "progress": 48,
+      "status": "green",
+      "value": "标准脉冲节奏",
+      "progress": 10,
       "lines": [
-        "低水平震颤持续中",
-        "24小时内14次小震",
-        "尚未出现连续强震颤"
+        "喷发后震颤迅速衰减",
+        "恢复间歇期标准水平",
+        "无异常活动"
       ]
     },
     {
@@ -36,227 +36,77 @@
       "title": "③ SO₂ 排放",
       "status": "green",
       "value": "~1–5k t/d",
-      "progress": 15,
+      "progress": 8,
       "lines": [
-        "间歇期正常范围",
-        "东裂谷低于检测限",
-        "南喷口脱气活跃"
+        "喷发后排放速率回归正常",
+        "间歇期典型范围",
+        "熔岩继续冷却"
       ]
     },
     {
       "id": 4,
       "title": "④ 摄像头",
-      "status": "red",
-      "value": "前驱溢流+双喷口辉光",
-      "progress": 95,
+      "status": "amber",
+      "value": "南喷口火焰，北口辉光",
+      "progress": 25,
       "lines": [
-        "北喷口：周一夜岩浆溢出（前驱溢流开始）",
-        "双喷口：整夜持续辉光+北喷口偶发强溅射",
-        "南喷口：间歇性火焰（volcanic gas点燃）"
+        "南喷口：整夜持续辉光 + 偶发火焰",
+        "北喷口：仅偶发辉光",
+        "地面火热点继续减少"
       ]
     }
   ],
   "change_alert": {
-    "has_changes": true,
-    "items": [
-      {
-        "icon": "⚡",
-        "highlight": "预警等级升级：ADVISORY/YELLOW → WATCH/ORANGE",
-        "detail": "周一夜北喷口岩浆溢出后，HVO 即时升级，标志前驱溢流正式启动、喷发临近"
-      },
-      {
-        "icon": "▲",
-        "highlight": "第45次前驱溢流已开始",
-        "detail": "北喷口于周一夜开始溢出岩浆，HVO 官方标记为前驱活动起点"
-      },
-      {
-        "icon": "▲",
-        "highlight": "HVO预测：今明两天概率最高",
-        "detail": "Episode 45 most likely 4/22 or 4/23，喷发在即"
-      },
-      {
-        "icon": "▲",
-        "highlight": "倾斜充能 98%：17.3 / 17.6 μrad",
-        "detail": "近满载状态，24h新增0.8 μrad，岩浆压力积累完成"
-      },
-      {
-        "icon": "●",
-        "highlight": "北喷口强溅射+双喷口整夜辉光",
-        "detail": "双喷口同时显示前驱活动，预示喷发规模可能达中等或大规模"
-      }
-    ]
+    "has_changes": false,
+    "items": []
   },
   "chart": {
-    "start_date": "2026-04-22",
+    "start_date": "2026-04-26",
     "days": 30,
-    "hvo_window": {
-      "start_index": 0,
-      "end_index": 4,
-      "label": "HVO官方窗口"
-    },
+    "hvo_window": null,
     "data": [
-      {
-        "date": "4/22",
-        "probability": 88,
-        "confidence": 82
-      },
-      {
-        "date": "4/23",
-        "probability": 92,
-        "confidence": 84
-      },
-      {
-        "date": "4/24",
-        "probability": 85,
-        "confidence": 81
-      },
-      {
-        "date": "4/25",
-        "probability": 76,
-        "confidence": 78
-      },
-      {
-        "date": "4/26",
-        "probability": 62,
-        "confidence": 74
-      },
-      {
-        "date": "4/27",
-        "probability": 45,
-        "confidence": 68
-      },
-      {
-        "date": "4/28",
-        "probability": 32,
-        "confidence": 62
-      },
-      {
-        "date": "4/29",
-        "probability": 22,
-        "confidence": 56
-      },
-      {
-        "date": "4/30",
-        "probability": 16,
-        "confidence": 50
-      },
-      {
-        "date": "5/1",
-        "probability": 12,
-        "confidence": 44
-      },
-      {
-        "date": "5/2",
-        "probability": 9,
-        "confidence": 38
-      },
-      {
-        "date": "5/3",
-        "probability": 7,
-        "confidence": 32
-      },
-      {
-        "date": "5/4",
-        "probability": 5,
-        "confidence": 28
-      },
-      {
-        "date": "5/5",
-        "probability": 4,
-        "confidence": 25
-      },
-      {
-        "date": "5/6",
-        "probability": 3,
-        "confidence": 22
-      },
-      {
-        "date": "5/7",
-        "probability": 2,
-        "confidence": 20
-      },
-      {
-        "date": "5/8",
-        "probability": 2,
-        "confidence": 18
-      },
-      {
-        "date": "5/9",
-        "probability": 1,
-        "confidence": 16
-      },
-      {
-        "date": "5/10",
-        "probability": 1,
-        "confidence": 15
-      },
-      {
-        "date": "5/11",
-        "probability": 1,
-        "confidence": 13
-      },
-      {
-        "date": "5/12",
-        "probability": 0,
-        "confidence": 12
-      },
-      {
-        "date": "5/13",
-        "probability": 0,
-        "confidence": 11
-      },
-      {
-        "date": "5/14",
-        "probability": 0,
-        "confidence": 10
-      },
-      {
-        "date": "5/15",
-        "probability": 0,
-        "confidence": 9
-      },
-      {
-        "date": "5/16",
-        "probability": 0,
-        "confidence": 8
-      },
-      {
-        "date": "5/17",
-        "probability": 0,
-        "confidence": 7
-      },
-      {
-        "date": "5/18",
-        "probability": 0,
-        "confidence": 6
-      },
-      {
-        "date": "5/19",
-        "probability": 0,
-        "confidence": 5
-      },
-      {
-        "date": "5/20",
-        "probability": 0,
-        "confidence": 4
-      },
-      {
-        "date": "5/21",
-        "probability": 0,
-        "confidence": 3
-      }
+      { "date": "4/26", "probability": 4, "confidence": 38 },
+      { "date": "4/27", "probability": 5, "confidence": 38 },
+      { "date": "4/28", "probability": 6, "confidence": 38 },
+      { "date": "4/29", "probability": 8, "confidence": 39 },
+      { "date": "4/30", "probability": 10, "confidence": 40 },
+      { "date": "5/1",  "probability": 15, "confidence": 42 },
+      { "date": "5/2",  "probability": 22, "confidence": 44 },
+      { "date": "5/3",  "probability": 30, "confidence": 46 },
+      { "date": "5/4",  "probability": 38, "confidence": 47 },
+      { "date": "5/5",  "probability": 46, "confidence": 48 },
+      { "date": "5/6",  "probability": 53, "confidence": 49 },
+      { "date": "5/7",  "probability": 59, "confidence": 50 },
+      { "date": "5/8",  "probability": 63, "confidence": 50 },
+      { "date": "5/9",  "probability": 64, "confidence": 49 },
+      { "date": "5/10", "probability": 62, "confidence": 48 },
+      { "date": "5/11", "probability": 58, "confidence": 47 },
+      { "date": "5/12", "probability": 52, "confidence": 45 },
+      { "date": "5/13", "probability": 44, "confidence": 43 },
+      { "date": "5/14", "probability": 35, "confidence": 41 },
+      { "date": "5/15", "probability": 27, "confidence": 39 },
+      { "date": "5/16", "probability": 21, "confidence": 37 },
+      { "date": "5/17", "probability": 16, "confidence": 35 },
+      { "date": "5/18", "probability": 13, "confidence": 33 },
+      { "date": "5/19", "probability": 11, "confidence": 31 },
+      { "date": "5/20", "probability": 10, "confidence": 30 },
+      { "date": "5/21", "probability": 10, "confidence": 29 },
+      { "date": "5/22", "probability": 11, "confidence": 28 },
+      { "date": "5/23", "probability": 13, "confidence": 27 },
+      { "date": "5/24", "probability": 16, "confidence": 26 },
+      { "date": "5/25", "probability": 20, "confidence": 26 }
     ]
   },
   "stats": {
-    "hvo_window": "4/22–4/26",
-    "days_since_last": 13,
-    "days_to_window": 0,
-    "network_status": "SDH离线"
+    "hvo_window": "5月初（待发布）",
+    "days_since_last": 3,
+    "days_to_window": null,
+    "network_status": "全面在线"
   },
   "travel_alert": {
-    "urgency": "go_now",
-    "color": "red",
-    "message": "前驱溢流已于周一夜开始，预警升至 WATCH/ORANGE，倾斜充能98%，HVO预测今明两天（4/22–4/23）喷发概率最高。如在夏威夷岛或能快速抵达，建议尽快出发 / 优先前往 Kīlauea Overlook。夜间辉光/喷泉效果最佳，停车场需早到占位。⚠️ 安全提示：全程佩戴护目镜与口罩，远离下风区，服从公园指令。"
+    "urgency": "watch",
+    "color": "amber",
+    "message": "第45次喷发已于4月23日完成（1:34-10:01 HST，8.5小时）。现处于深度间歇期早期，预警已回到 ADVISORY/YELLOW。第46次预计5月初，HVO尚未发布具体窗口。建议订阅 USGS HVO 邮件列表，新窗口发布时会立即通知。"
   },
-  "footnote": "SDH 倾斜仪仍因 tephra 覆盖离线，UWD 数据正常。窗口 4/22–4/26 为 USGS HVO 官方建模结果，其中4/22–4/23概率最高。前驱溢流已确认，喷发进入临近阶段（12–48小时内）。"
+  "footnote": "第45次喷发总结：4月23日凌晨1:34-上午10:01 HST，北喷口单独活跃，喷泉最高 ~1,000 英尺，持续8.5小时，规模中等。南喷口全程未喷。Tephra 吹向西南，无显著危害。现处于深度间歇期，倾斜充能仅 ~5%，预计2-3周才能进入新的前驱阶段。"
 }
