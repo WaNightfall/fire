@@ -4,1540 +4,422 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>基拉韦厄火山日报 · Kīlauea Monitor</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  :root {
-    --bg:        #0d0e0f;
-    --bg2:       #141516;
-    --bg3:       #1a1b1d;
-    --border:    rgba(255,255,255,0.07);
-    --border2:   rgba(255,255,255,0.12);
-    --text:      #e8e6e0;
-    --text2:     #8a8680;
-    --text3:     #5a5854;
-    --lava:      #e85d24;
-    --lava2:     #f07840;
-    --lava-dim:  rgba(232,93,36,0.12);
-    --amber:     #c98a1a;
-    --amber-dim: rgba(201,138,26,0.12);
-    --green:     #2a7a4a;
-    --green-dim: rgba(42,122,74,0.1);
-    --red:       #c43030;
-    --red-dim:   rgba(196,48,48,0.12);
-    --mono:      'Space Mono', monospace;
-    --sans:      'Noto Sans SC', sans-serif;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
+    background: #0d0e0f;
+    color: #e8e6e0;
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 14px;
     line-height: 1.6;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232,93,36,0.07) 0%, transparent 60%);
   }
-
-  /* ── GRAIN OVERLAY ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
-
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 24px 20px 60px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── HEADER ── */
-  .header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 28px 0 24px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-  }
-
-  .header-left { display: flex; flex-direction: column; gap: 6px; }
-
-  .volcano-name {
-    font-family: var(--mono);
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
-
-  .volcano-name span {
-    color: var(--lava);
-  }
-
-  .data-source {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text3);
-    letter-spacing: 0.5px;
-  }
-
-  .data-source a {
-    color: var(--text3);
-    text-decoration: none;
-    border-bottom: 1px solid var(--text3);
-    transition: color 0.2s;
-  }
-  .data-source a:hover { color: var(--lava2); border-color: var(--lava2); }
-
-  .header-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-  }
-
-  .badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    border-radius: 2px;
-    text-transform: uppercase;
-  }
-
-  .badge-advisory { background: rgba(201,138,26,0.2); color: #e8a820; border: 1px solid rgba(201,138,26,0.4); }
-  .badge-watch    { background: rgba(220,100,30,0.2); color: #f07030; border: 1px solid rgba(220,100,30,0.4); }
-  .badge-warning  { background: rgba(196,48,48,0.2);  color: #e05050; border: 1px solid rgba(196,48,48,0.4); }
-  .badge-yellow   { background: rgba(201,138,26,0.15); color: #c8a020; border: 1px solid rgba(201,138,26,0.3); }
-  .badge-orange   { background: rgba(220,100,30,0.15); color: #e07828; border: 1px solid rgba(220,100,30,0.3); }
-  .badge-red      { background: var(--red-dim); color: #d84040; border: 1px solid rgba(196,48,48,0.35); }
-  .badge-window   { background: var(--lava-dim); color: var(--lava2); border: 1px solid rgba(232,93,36,0.4); }
-  .badge-normal   { background: var(--green-dim); color: #3a9a5a; border: 1px solid rgba(42,122,74,0.35); }
-  .badge-partial  { background: var(--amber-dim); color: #d09020; border: 1px solid rgba(201,138,26,0.35); }
-  .badge-outage   { background: var(--red-dim); color: #d84040; border: 1px solid rgba(196,48,48,0.35); }
-
-  /* ── REFRESH ROW ── */
-  .refresh-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 4px;
-  }
-
-  .refresh-btn {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    background: transparent;
-    border: 1px solid var(--border2);
-    color: var(--text2);
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    padding: 6px 14px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-  }
-
-  .refresh-btn:hover:not(:disabled) {
-    border-color: var(--lava);
-    color: var(--lava2);
-    background: var(--lava-dim);
-  }
-
-  .refresh-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  .refresh-icon { display: inline-block; font-size: 14px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spinning { animation: spin 0.8s linear infinite; }
-
-  .last-updated {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    letter-spacing: 0.3px;
-  }
-
-  /* ── SECTION LABEL ── */
-  .section-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text3);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* ── METRICS GRID ── */
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-
-  @media (max-width: 768px) {
-    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 480px) {
-    .metrics-grid { grid-template-columns: 1fr; }
-  }
-
-  .metric-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 16px;
-    border-radius: 3px;
-    transition: border-color 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-  }
-
-  .metric-card.status-green::before  { background: var(--green); }
-  .metric-card.status-amber::before  { background: var(--amber); }
-  .metric-card.status-red::before    { background: var(--red); }
-
-  .metric-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .status-dot.green { background: #3aaa5a; box-shadow: 0 0 6px rgba(58,170,90,0.5); }
-  .status-dot.amber { background: #e0a020; box-shadow: 0 0 6px rgba(224,160,32,0.5); }
-  .status-dot.red   { background: var(--lava); box-shadow: 0 0 6px rgba(232,93,36,0.6); }
-
-  .metric-title {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    color: var(--text2);
-  }
-
-  .metric-value {
-    font-family: var(--mono);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 8px;
-    line-height: 1.2;
-  }
-
-  .metric-progress-track {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-
-  .metric-progress-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.6s ease;
-  }
-
-  .status-green .metric-progress-fill  { background: #3aaa5a; }
-  .status-amber .metric-progress-fill  { background: var(--amber); }
-  .status-red   .metric-progress-fill  { background: var(--lava); }
-
-  .metric-lines { display: flex; flex-direction: column; gap: 3px; }
-
-  .metric-line {
-    font-size: 11px;
-    color: var(--text2);
-    line-height: 1.4;
-  }
-
-  .metric-line.highlight {
-    color: var(--lava2);
-    font-weight: 500;
-  }
-
-  /* ── CHANGE ALERT ── */
-  .change-alert {
-    background: var(--bg2);
-    border: 1px solid rgba(232,93,36,0.3);
-    border-left: 3px solid var(--lava);
-    padding: 16px 18px;
-    border-radius: 3px;
-    margin-bottom: 28px;
-  }
-
-  .change-alert-title {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    color: var(--lava2);
-    margin-bottom: 12px;
-  }
-
-  .change-items { display: flex; flex-direction: column; gap: 7px; }
-
-  .change-item {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    font-size: 12px;
-    color: var(--text2);
-    line-height: 1.5;
-  }
-
-  .change-icon {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--lava);
-    flex-shrink: 0;
-    margin-top: 1px;
-    width: 14px;
-  }
-
-  .change-highlight { color: var(--text); font-weight: 500; }
-
-  /* ── CHART SECTION ── */
-  .chart-section {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 20px;
-    border-radius: 3px;
-    margin-bottom: 20px;
-  }
-
-  .chart-legend {
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    color: var(--text2);
-  }
-
-  .legend-item { display: flex; align-items: center; gap: 6px; }
-  .legend-bar  { width: 12px; height: 10px; border-radius: 1px; }
-  .legend-line { width: 20px; height: 2px; }
-  .legend-box  { width: 12px; height: 12px; border-radius: 1px; }
-
-  .chart-wrap {
-    position: relative;
-    width: 100%;
-    height: 240px;
-  }
-
-  /* ── STATS ROW ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  @media (max-width: 600px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  .stat-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 14px 16px;
-    border-radius: 3px;
-  }
-
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: var(--text3);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .stat-value {
-    font-family: var(--mono);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .stat-value.highlight { color: var(--lava2); }
-
-  .stat-sub {
-    font-size: 10px;
-    color: var(--text3);
-  }
-
-  /* ── TRAVEL ALERT ── */
-  .travel-alert {
-    border: 1px solid;
-    padding: 16px 18px;
-    border-radius: 3px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-  }
-
-  .travel-alert.watch   { border-color: rgba(201,138,26,0.3); background: var(--amber-dim); }
-  .travel-alert.prepare { border-color: rgba(232,93,36,0.35); background: var(--lava-dim); }
-  .travel-alert.go_now  { border-color: rgba(196,48,48,0.4);  background: var(--red-dim); }
-
-  .travel-icon {
-    font-family: var(--mono);
-    font-size: 20px;
-    line-height: 1;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .travel-alert.watch   .travel-icon { color: #d09020; }
-  .travel-alert.prepare .travel-icon { color: var(--lava2); }
-  .travel-alert.go_now  .travel-icon { color: #d84040; }
-
-  .travel-content { flex: 1; }
-
-  .travel-title {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    margin-bottom: 5px;
-  }
-
-  .travel-alert.watch   .travel-title { color: #d09020; }
-  .travel-alert.prepare .travel-title { color: var(--lava2); }
-  .travel-alert.go_now  .travel-title { color: #e05050; }
-
-  .travel-message { font-size: 12px; color: var(--text2); line-height: 1.6; }
-
-  /* ── FOOTNOTE ── */
-  .footnote {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    line-height: 1.6;
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
-    letter-spacing: 0.3px;
-  }
-
-  /* ── FLASH ANIMATION ── */
-  @keyframes flash-update {
-    0%   { background: rgba(232,93,36,0.18); border-color: rgba(232,93,36,0.5); }
-    100% { background: var(--bg2); border-color: var(--border); }
-  }
-
-  .just-updated {
-    animation: flash-update 2s ease-out forwards;
-  }
-
-  /* ── ERROR TOAST ── */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    color: var(--text2);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 10px 16px;
-    border-radius: 3px;
-    z-index: 100;
-    transform: translateY(80px);
-    opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.error { border-color: rgba(196,48,48,0.5); color: #d84040; }
-  .toast.success { border-color: rgba(42,122,74,0.5); color: #3aaa5a; }
-
-  /* ── SUPPLEMENTS SECTION ── */
-  .supplements-section {
-    margin-top: 40px;
-    border-top: 1px solid var(--border);
-    padding-top: 24px;
-  }
-  .supplement-panels { display: flex; flex-direction: column; gap: 8px; }
-  .supplement-panel {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  .panel-trigger {
-    width: 100%; padding: 16px; background: transparent; border: none;
-    color: var(--text); font-family: var(--sans); font-size: 13px;
-    text-align: left; cursor: pointer; display: flex; align-items: center;
-    gap: 12px; transition: background 0.2s;
-  }
-  .panel-trigger:hover { background: rgba(232,93,36,0.08); }
-  .panel-icon {
-    display: inline-block; width: 16px; font-family: var(--mono);
-    color: var(--lava); transition: transform 0.3s; flex-shrink: 0;
-  }
-  .supplement-panel.open .panel-icon { transform: rotate(90deg); }
-  .panel-title { font-weight: 500; color: var(--text); flex: 1; }
-  .panel-subtitle { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 0.5px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+  .header { display: flex; justify-content: space-between; align-items: center; padding: 28px 0 24px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 28px; flex-wrap: wrap; gap: 20px; }
+  .title { font-size: 22px; font-weight: bold; }
+  .title span { color: #e85d24; }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.1); }
+  .badge-advisory { background: rgba(201,138,26,0.2); color: #e8a820; }
+  .badge-yellow { background: rgba(201,138,26,0.15); color: #c8a020; }
+  .badge-normal { background: rgba(42,122,74,0.1); color: #3a9a5a; }
+  .badge-window { background: rgba(232,93,36,0.12); color: #f07840; }
+  .section-title { font-size: 10px; letter-spacing: 2px; color: #5a5854; text-transform: uppercase; margin: 20px 0 12px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .card { background: #141516; border: 1px solid rgba(255,255,255,0.07); padding: 16px; border-radius: 3px; }
+  .card-title { font-size: 10px; letter-spacing: 0.5px; color: #8a8680; margin-bottom: 8px; }
+  .card-value { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .card-text { font-size: 11px; color: #8a8680; line-height: 1.4; }
+  .chart-section { background: #141516; border: 1px solid rgba(255,255,255,0.07); padding: 20px; border-radius: 3px; margin-bottom: 20px; }
+  canvas { max-width: 100%; }
+  .alert { border-left: 3px solid; padding: 16px 18px; margin-bottom: 16px; border-radius: 3px; display: flex; gap: 14px; }
+  .alert-watch { border-color: #c98a1a; background: rgba(201,138,26,0.12); }
+  .alert-icon { font-size: 20px; flex-shrink: 0; }
+  .alert-message { font-size: 12px; line-height: 1.6; }
+  .supplements { margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .panel { background: #141516; border: 1px solid rgba(255,255,255,0.07); border-radius: 3px; margin-bottom: 8px; }
+  .panel-header { padding: 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; background: transparent; border: none; width: 100%; text-align: left; color: #e8e6e0; }
+  .panel-header:hover { background: rgba(232,93,36,0.08); }
+  .panel-icon { color: #e85d24; transition: transform 0.3s; }
+  .panel.open .panel-icon { transform: rotate(90deg); }
   .panel-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-  .supplement-panel.open .panel-content { max-height: 3000px; }
+  .panel.open .panel-content { max-height: 3000px; }
   .panel-inner { padding: 0 16px 16px; }
-
-  /* INFO GRID */
   .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
-  .info-card { background: var(--bg3); border: 1px solid var(--border); padding: 12px; border-radius: 2px; }
-  .info-label { font-weight: 500; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
-  .badge-key, .badge-moderate, .badge-visual { font-size: 9px; font-family: var(--mono); letter-spacing: 0.5px; padding: 2px 6px; border-radius: 2px; }
-  .badge-key   { background: var(--lava-dim); color: var(--lava2); }
-  .badge-moderate { background: var(--amber-dim); color: var(--amber); }
-  .badge-visual { background: rgba(122,111,208,0.15); color: #7a6fd0; }
-  .info-desc { font-size: 11px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+  .info-card { background: #1a1b1d; border: 1px solid rgba(255,255,255,0.07); padding: 12px; border-radius: 2px; }
+  .info-label { font-weight: 500; color: #e8e6e0; margin-bottom: 6px; font-size: 12px; }
+  .info-desc { font-size: 11px; color: #8a8680; margin-bottom: 10px; line-height: 1.5; }
   .info-rows { display: flex; flex-direction: column; gap: 6px; }
   .info-row { display: flex; gap: 8px; font-size: 11px; }
-  .row-label { color: var(--text3); font-weight: 500; min-width: 80px; flex-shrink: 0; }
-  .row-value { color: var(--text2); flex: 1; }
-
-  /* LIFECYCLE TABLE */
-  .lifecycle-table { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
-  .lc-row { display: grid; grid-template-columns: 120px 1fr 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
-  .lc-row:last-child { border-bottom: none; }
-  .lc-header { background: rgba(232,93,36,0.08); }
-  .lc-header .lc-col { font-weight: 500; color: var(--lava2); font-size: 11px; }
-  .lc-row:not(.lc-header) { border-left: 4px solid var(--stage-color); }
-  .lc-col { padding: 10px; font-size: 11px; color: var(--text2); display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.4; }
-  .lc-stage { text-align: left; }
-  .stage-label { color: var(--text); font-weight: 500; }
-
-  /* TIMELINE */
-  .timeline-wrapper { margin-bottom: 20px; }
-  .timeline { position: relative; height: 60px; margin-bottom: 20px; }
-  .tl-axis { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); transform: translateY(-50%); }
-  .tl-mark { position: absolute; top: 50%; width: 80px; transform: translate(-40px,-50%); display: flex; justify-content: center; }
-  .tl-mark::before { content: ''; position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--mark-color, var(--text3)); border: 2px solid var(--bg2); top: -3px; }
-  .tl-label { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 14px; }
-  .timeline-phases { position: relative; height: 40px; margin-bottom: 12px; }
-  .phase { position: absolute; top: 0; height: 100%; background: var(--phase-color); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text2); }
-  .phase-title { font-weight: 500; color: var(--text); }
-  .phase-desc { font-size: 9px; }
-  /* OBS TIMELINE TABLE (时间为列，观测类型为行) */
-  .obs-timeline { display: grid; grid-template-columns: 80px repeat(5, 1fr); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 14px; font-size: 11px; }
-  .otc { padding: 9px 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.4; color: var(--text2); }
-  .otc:nth-child(6n) { border-right: none; }
-  .otc-head { background: rgba(232,93,36,0.08); font-weight: 500; color: var(--lava2); font-size: 10px; }
-  .otc-erupt { background: rgba(196,48,48,0.07); }
-  .otc-label { background: var(--bg2); color: var(--text); font-weight: 500; border-right: 1px solid var(--border2); justify-content: flex-start; padding-left: 10px; }
-  .timeline-tips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  .tip { background: var(--bg3); border: 1px dashed var(--border2); padding: 8px; font-size: 10px; color: var(--text3); text-align: center; border-radius: 2px; }
-
-  /* HISTORY TABLE */
-  .history-table { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 16px; font-size: 11px; }
-  .hist-row { display: grid; grid-template-columns: 50px 110px 80px 60px 100px 1fr; border-bottom: 1px solid var(--border); }
-  .hist-row:last-child { border-bottom: none; }
-  .hist-header { background: rgba(232,93,36,0.08); font-weight: 500; color: var(--lava2); }
-  .hist-row.highlight { background: rgba(232,93,36,0.05); }
-  .hist-col { padding: 8px; color: var(--text2); display: flex; align-items: center; }
-  .history-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
-  .summary-item { background: var(--bg3); border: 1px solid var(--border); padding: 10px; border-radius: 2px; }
-  .summary-label { display: block; font-size: 10px; color: var(--text3); margin-bottom: 3px; }
-  .summary-value { display: block; font-size: 12px; font-family: var(--mono); color: var(--text); font-weight: 500; }
-
-  @media (max-width: 800px) {
-    .observation-grid { grid-template-columns: repeat(2, 1fr); }
-    .timeline-tips { grid-template-columns: repeat(3, 1fr); }
-    .lc-row { grid-template-columns: 1fr; }
-    .hist-row { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 600px) {
-    .info-grid { grid-template-columns: 1fr; }
-  }
-
-  /* ── MOBILE ── */
-  @media (max-width: 640px) {
-    .container { padding: 14px 12px 48px; }
-
-    /* header stacks */
-    .header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 16px 0 14px; margin-bottom: 20px; }
-    .header-right { align-items: flex-start; width: 100%; }
-    .badges { justify-content: flex-start; gap: 6px; }
-    .volcano-name { font-size: 17px; }
-    .data-source { font-size: 10px; }
-    .refresh-row { margin-top: 2px; }
-
-    /* metrics */
-    .metric-value { font-size: 15px; }
-    .metric-card { padding: 12px; }
-
-    /* chart shorter */
-    .chart-wrap { height: 190px; }
-
-    /* stats */
-    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .stat-value { font-size: 18px; }
-    .stat-card { padding: 11px 12px; }
-
-    /* travel alert */
-    .travel-alert { gap: 10px; padding: 12px 14px; }
-    .travel-icon { font-size: 17px; }
-    .travel-message { font-size: 11px; }
-
-    /* change alert */
-    .change-alert { padding: 12px 14px; }
-
-    /* section label */
-    .section-label { font-size: 9px; }
-
-    /* supplement panels */
-    .panel-trigger { padding: 12px; gap: 10px; font-size: 12px; }
-    .panel-subtitle { font-size: 9px; display: none; }
-
-    /* scroll containers for wide tables */
-    .panel-inner { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .lifecycle-table { min-width: 480px; }
-    .obs-timeline { min-width: 460px; }
-    .history-table { min-width: 520px; }
-    .history-summary { grid-template-columns: 1fr; }
-    .timeline-tips { grid-template-columns: repeat(2, 1fr); }
-
-    /* footnote */
-    .footnote { font-size: 9px; }
-    .supplements-section { margin-top: 28px; }
-  }
-
-  /* ── WEBCAM LINKS ── */
-  .webcam-links { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
-  .webcam-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 12px 16px;
-    color: var(--text2);
-    text-decoration: none;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.3px;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-  }
-  .webcam-link:hover { border-color: var(--lava); color: var(--lava2); background: var(--lava-dim); }
-  .wl-icon { color: var(--lava); font-size: 11px; flex-shrink: 0; }
+  .row-label { color: #5a5854; font-weight: 500; min-width: 80px; flex-shrink: 0; }
+  .row-value { color: #8a8680; flex: 1; }
+  table { width: 100%; font-size: 11px; border-collapse: collapse; margin: 12px 0; }
+  th, td { padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  th { background: rgba(232,93,36,0.08); font-weight: 500; color: #f07840; }
+  tr:hover { background: rgba(232,93,36,0.04); }
+  .footer { color: #5a5854; font-size: 10px; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 16px; letter-spacing: 0.3px; }
+  @media (max-width: 768px) { .header { flex-direction: column; align-items: flex-start; } .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <div class="container">
-
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <div class="volcano-name">Kīlauea <span>·</span> 基拉韦厄日报</div>
-      <div class="data-source">
-        <span id="data-source-text">数据加载中...</span> ·
-        <a id="source-link" href="#" target="_blank">USGS HVO 原始日报 ↗</a>
-      </div>
+  <div class="header">
+    <div>
+      <div class="title">Kīlauea <span>·</span> 基拉韦厄日报</div>
+      <div style="font-size: 11px; color: #5a5854; margin-top: 4px;">USGS HVO 日报 · <a href="https://www.usgs.gov/volcanoes/kilauea" target="_blank" style="color: #5a5854; text-decoration: none; border-bottom: 1px solid #5a5854;">原始日报 ↗</a></div>
     </div>
-    <div class="header-right">
-      <div class="badges" id="badges-container"></div>
-      <div class="refresh-row">
-        <button class="refresh-btn" id="refresh-btn" onclick="refreshData()">
-          <span class="refresh-icon" id="refresh-icon">↻</span>
-          <span id="refresh-label">刷新数据</span>
-        </button>
-        <div class="last-updated" id="last-updated"></div>
-      </div>
-    </div>
-  </header>
-
-  <!-- METRICS -->
-  <div class="section-label">监测指标</div>
-  <div class="metrics-grid" id="metrics-grid"></div>
-
-  <!-- CHART -->
-  <div class="section-label">未来30天概率预测</div>
-  <div class="chart-section">
-    <div class="chart-legend">
-      <div class="legend-item"><div class="legend-bar" style="background:#1D9E75"></div>低概率 &lt;20%</div>
-      <div class="legend-item"><div class="legend-bar" style="background:#BA7517"></div>中概率 20–50%</div>
-      <div class="legend-item"><div class="legend-bar" style="background:#c43030"></div>高概率 &gt;50%</div>
-      <div class="legend-item"><div class="legend-line" style="background:#7a6fd0"></div>置信度（右轴）</div>
-      <div class="legend-item"><div class="legend-box" style="background:rgba(196,48,48,0.1);border:1px dashed rgba(196,48,48,0.4)"></div>HVO 官方窗口</div>
-    </div>
-    <div class="chart-wrap">
-      <canvas id="main-chart" role="img" aria-label="未来30天基拉韦厄喷发概率与置信度图表"></canvas>
-    </div>
+    <div class="badges" id="badges"></div>
   </div>
 
-  <!-- STATS -->
-  <div class="section-label">关键数据</div>
-  <div class="stats-row" id="stats-row"></div>
-
-  <!-- TRAVEL ALERT -->
-  <div class="section-label">出行建议</div>
-  <div id="travel-alert-container"></div>
-
-  <!-- WEBCAM -->
-  <div class="section-label">实时摄像头</div>
-  <div class="webcam-links">
-    <a class="webcam-link" href="https://www.youtube.com/watch?v=NDA9Bsvjwdk" target="_blank" rel="noopener">
-      <span class="wl-icon">▶</span>
-      <span class="wl-text">直播频道 1 · YouTube ↗</span>
-    </a>
-    <a class="webcam-link" href="https://www.youtube.com/watch?v=Tz5tPqRRv1Y" target="_blank" rel="noopener">
-      <span class="wl-icon">▶</span>
-      <span class="wl-text">直播频道 2 · YouTube ↗</span>
-    </a>
-    <a class="webcam-link" href="https://www.youtube.com/watch?v=gXKuUyKt8mc" target="_blank" rel="noopener">
-      <span class="wl-icon">▶</span>
-      <span class="wl-text">直播频道 3 · YouTube ↗</span>
-    </a>
+  <div id="content">
+    <div style="text-align: center; padding: 40px; color: #8a8680;">⏳ 初始化中...</div>
   </div>
 
-  <!-- CHANGE ALERT -->
-  <div id="change-alert-container"></div>
-
-  <!-- FOOTNOTE -->
-  <div class="footnote" id="footnote"></div>
-
-  <!-- SUPPLEMENTARY INFO -->
-  <div class="supplements-section">
-    <div class="supplement-panels">
-
-      <!-- 面板 1：四大核心指标详解 -->
-      <div class="supplement-panel">
-        <button class="panel-trigger" onclick="togglePanel(this)">
-          <span class="panel-icon">▶</span>
-          <span class="panel-title">① 四大核心指标详解</span>
-          <span class="panel-subtitle">实时数据源 · 预警规律</span>
-        </button>
-        <div class="panel-content">
-          <div class="panel-inner">
+  <!-- 补充信息面板 -->
+  <div class="supplements">
+    <div class="panel">
+      <button class="panel-header" onclick="togglePanel(this)">
+        <span class="panel-icon">▶</span>
+        <span>① 四大核心指标详解</span>
+      </button>
+      <div class="panel-content">
+        <div class="panel-inner">
           <div class="info-grid">
             <div class="info-card">
-              <div class="info-label">① 地倾斜（Tilt）<span class="badge-key">最关键</span></div>
-              <div class="info-desc">HVO 核心预测依据。UWD（Uēkahuna）和 SDH 两个倾斜仪记录地表膨胀/收缩量（微弧度）。喷发前持续膨胀 → 喷发中急剧偏转 → 喷发后快速回弹。</div>
+              <div class="info-label">① 地倾斜（Tilt）</div>
+              <div class="info-desc">HVO 核心预测依据。UWD和SDH倾斜仪记录地表膨胀/收缩（微弧度）。喷发前持续膨胀→喷发中急剧偏转→喷发后快速回弹。</div>
               <div class="info-rows">
-                <div class="info-row"><span class="row-label">正常间歇期：</span><span class="row-value">缓慢持续膨胀，每日 0.5–2 微弧度</span></div>
-                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">膨胀速率加快（&gt;2 μrad/天）或出现昼夜偏转后快速回弹</span></div>
-                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">急速偏转间断开始，此后 0–6 小时内多次喷发</span></div>
-                <div class="info-row"><span class="row-label">历史范围：</span><span class="row-value">第 44 次总偏转约 17.6 μrad，第 39 次约 31.6 μrad</span></div>
+                <div class="info-row"><span class="row-label">正常间歇期：</span><span class="row-value">缓慢膨胀，0.5–2 μrad/天</span></div>
+                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">膨胀速率加快（>2 μrad/天）</span></div>
+                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">急速偏转间断开始，0–6小时内喷发</span></div>
+                <div class="info-row"><span class="row-label">历史范围：</span><span class="row-value">第44次17.6 μrad，第39次31.6 μrad</span></div>
               </div>
             </div>
             <div class="info-card">
-              <div class="info-label">② 地震震颤（Tremor）<span class="badge-moderate">高重要性</span></div>
-              <div class="info-desc">反映岩浆在管道内的活动强度。间歇期持续低水平震颤，对应气体活塞事件（5–15 分钟一次脉冲），喷发开始时震颤陡增。</div>
+              <div class="info-label">② 地震震颤（Tremor）</div>
+              <div class="info-desc">反映岩浆在管道内活动强度。间歇期持续低水平脉冲，喷发时陡增。</div>
               <div class="info-rows">
-                <div class="info-row"><span class="row-label">正常间歇期：</span><span class="row-value">每 5–15 分钟一次短脉冲，基础水平低</span></div>
-                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">脉冲频率加密（&lt;5 分钟）或出现持续性连续震颤</span></div>
-                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">震颤幅升 5–10 倍并持续，通常领先喷口溅射 15–30 分钟</span></div>
-                <div class="info-row"><span class="row-label">监测工具：</span><span class="row-value">USGS 地震实时图 rsam.volcanoes.usgs.gov</span></div>
+                <div class="info-row"><span class="row-label">正常间歇期：</span><span class="row-value">每5–15分钟一次脉冲</span></div>
+                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">脉冲加密（<5分钟）或连续震颤</span></div>
+                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">震颤升5–10倍并持续</span></div>
+                <div class="info-row"><span class="row-label">监测工具：</span><span class="row-value">USGS地震实时图</span></div>
               </div>
             </div>
             <div class="info-card">
-              <div class="info-label">③ SO₂ 排放量<span class="badge-moderate">中等重要性</span></div>
-              <div class="info-desc">反映深部岩浆脱气及喷口活跃。间歇期偏高说明岩浆"憋气"，喷发中峰值剧增。</div>
+              <div class="info-label">③ SO₂ 排放量</div>
+              <div class="info-desc">反映深部岩浆脱气及喷口活跃。间歇期偏高说明岩浆"憋气"。</div>
               <div class="info-rows">
                 <div class="info-row"><span class="row-label">正常间歇期：</span><span class="row-value">1,000–5,000 吨/天</span></div>
-                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">&gt;5,000 吨/天，接近喷发前阈值段上限</span></div>
-                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">前驱溢流阶段可见显著升高</span></div>
-                <div class="info-row"><span class="row-label">历史数据：</span><span class="row-value">第 44 次喷发中测得 208,000 吨/天</span></div>
+                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">>5,000 吨/天</span></div>
+                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">前驱溢流阶段升高</span></div>
+                <div class="info-row"><span class="row-label">历史数据：</span><span class="row-value">第44次喷发中208,000吨/天</span></div>
               </div>
             </div>
             <div class="info-card">
-              <div class="info-label">④ 摄像头辉光 + 前驱溢流<span class="badge-visual">直观可视</span></div>
-              <div class="info-desc">最直观的前驱信号。USGS 直播摄像头（V1/V2cam）可观察喷口辉光强度和溢流频率。前驱溢流通常在主喷发前 5–9 天开始。</div>
+              <div class="info-label">④ 摄像头辉光 + 前驱溢流</div>
+              <div class="info-desc">最直观前驱信号。前驱溢流通常在主喷发前5–9天开始。</div>
               <div class="info-rows">
                 <div class="info-row"><span class="row-label">间歇期特征：</span><span class="row-value">间歇性辉光，无溢流</span></div>
-                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">持续辉光 + 溢流频率增（每天数十次→数百次）</span></div>
-                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">溢流无回流、无间断，出现气体喷射（jetting）</span></div>
-                <div class="info-row"><span class="row-label">观看渠道：</span><span class="row-value">YouTube @USGS · V1/V2cam 直播（夜间效果最佳）</span></div>
+                <div class="info-row"><span class="row-label">预警信号：</span><span class="row-value">持续辉光+溢流增加</span></div>
+                <div class="info-row"><span class="row-label">临发信号：</span><span class="row-value">溢流无间断，气体喷射</span></div>
+                <div class="info-row"><span class="row-label">观看渠道：</span><span class="row-value">YouTube @USGS V1/V2cam直播</span></div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <button class="panel-header" onclick="togglePanel(this)">
+        <span class="panel-icon">▶</span>
+        <span>② 喷发周期 7 天判断框架</span>
+      </button>
+      <div class="panel-content">
+        <div class="panel-inner">
+          <table>
+            <tr style="background: rgba(232,93,36,0.08);">
+              <th>阶段</th><th>倾斜仪</th><th>震颤</th><th>SO₂</th><th>摄像头</th>
+            </tr>
+            <tr style="border-left: 4px solid #2a7a4a;">
+              <td>深度间歇期<br>(+3至+18天)</td>
+              <td>稳定慢膨胀<br>0.5–1 μrad/天</td>
+              <td>低水平脉冲<br>10–15 min/次</td>
+              <td>1,000–3,000<br>吨/天</td>
+              <td>间歇辉光<br>无溢流</td>
+            </tr>
+            <tr style="border-left: 4px solid #c98a1a;">
+              <td>过渡期<br>(+18至+22天)</td>
+              <td>膨胀速率加快<br>1–2 μrad/天</td>
+              <td>脉冲加密<br>5–10 min/次</td>
+              <td>3,000–5,000<br>吨/天</td>
+              <td>持续辉光<br>偶发溢流</td>
+            </tr>
+            <tr style="border-left: 4px solid #e05d24;">
+              <td>前驱溢流期<br>(+22至+28天)</td>
+              <td>加速膨胀或<br>短暂转向回升</td>
+              <td>连续震颤<br><5 min/次</td>
+              <td>>5,000<br>吨/天</td>
+              <td>频繁溢流<br>每天10–75次</td>
+            </tr>
+            <tr style="border-left: 4px solid #c43030;">
+              <td>临发<br>(12–48h)</td>
+              <td>急剧偏转<br>即时转升</td>
+              <td>震颤升5–10倍<br>并持续</td>
+              <td>急剧升高<br>>10,000</td>
+              <td>连续溢流<br>气体喷射</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <button class="panel-header" onclick="togglePanel(this)">
+        <span class="panel-icon">▶</span>
+        <span>③ 历史喷发数据（第35-45次）</span>
+      </button>
+      <div class="panel-content">
+        <div class="panel-inner">
+          <table>
+            <tr style="background: rgba(232,93,36,0.08);">
+              <th>轮次</th><th>日期</th><th>时长</th><th>间隔</th><th>倾斜</th><th>备注</th>
+            </tr>
+            <tr><td>35</td><td>2025-10-18</td><td>7.5h</td><td>16d</td><td>24.2μrad</td><td>弱</td></tr>
+            <tr><td>36</td><td>2025-11-03</td><td>2.5h</td><td>3d</td><td>—</td><td>最短</td></tr>
+            <tr><td>37</td><td>2025-11-25</td><td>9.2h</td><td>11d</td><td>—</td><td>中</td></tr>
+            <tr><td>38</td><td>2025-12-06</td><td>11h</td><td>18d</td><td>17.6μrad</td><td>强</td></tr>
+            <tr><td>39</td><td>2025-12-24</td><td>6h</td><td>17d</td><td>26.8μrad</td><td>最大喷泉1400ft</td></tr>
+            <tr><td>40</td><td>2026-01-12</td><td>10h</td><td>12d</td><td>23.0μrad</td><td>强</td></tr>
+            <tr><td>41</td><td>2026-01-24</td><td>8.33h</td><td>22d</td><td>—</td><td>拐点</td></tr>
+            <tr><td>42</td><td>2026-02-15</td><td>10h</td><td>23d</td><td>—</td><td>拉长</td></tr>
+            <tr><td>43</td><td>2026-03-10</td><td>9h</td><td>30d</td><td>—</td><td>最长</td></tr>
+            <tr style="background: rgba(232,93,36,0.05);"><td>44</td><td>2026-04-09</td><td>8.5h</td><td>14d</td><td>17.6μrad</td><td>复苏期</td></tr>
+            <tr><td>45</td><td>2026-04-23</td><td>8.5h</td><td>—</td><td>17.3μrad</td><td>热活跃期</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <button class="panel-header" onclick="togglePanel(this)">
+        <span class="panel-icon">▶</span>
+        <span>④ 实时摄像头直播</span>
+      </button>
+      <div class="panel-content">
+        <div class="panel-inner">
+          <div style="font-size: 12px; line-height: 1.8; color: #8a8680;">
+            <div style="margin-bottom: 8px;">▶ 直播频道 1 · YouTube ↗</div>
+            <div style="margin-bottom: 8px;">▶ 直播频道 2 · YouTube ↗</div>
+            <div style="margin-bottom: 8px;">▶ 直播频道 3 · YouTube ↗</div>
+            <div style="margin-top: 12px; font-size: 11px; color: #5a5854;">夜间观看效果最佳，可清晰观察喷口辉光和溅射。</div>
           </div>
         </div>
       </div>
-
-      <!-- 面板 2：喷发阶段生命周期 -->
-      <div class="supplement-panel">
-        <button class="panel-trigger" onclick="togglePanel(this)">
-          <span class="panel-icon">▶</span>
-          <span class="panel-title">② 喷发周期 7 天判断框架</span>
-          <span class="panel-subtitle">阶段标志 · 综合信号评分</span>
-        </button>
-        <div class="panel-content">
-          <div class="panel-inner">
-          <div class="lifecycle-table">
-            <div class="lc-row lc-header">
-              <div class="lc-col lc-stage">阶段</div>
-              <div class="lc-col">倾斜仪</div>
-              <div class="lc-col">震颤</div>
-              <div class="lc-col">SO₂</div>
-              <div class="lc-col">摄像头</div>
-            </div>
-            <div class="lc-row" style="--stage-color: #2a7a4a">
-              <div class="lc-col lc-stage"><span class="stage-label">深度间歇期<br>(+3至+18 天)</span></div>
-              <div class="lc-col">稳定慢膨胀<br>0.5–1 μrad/天</div>
-              <div class="lc-col">低水平脉冲<br>10–15 min/次</div>
-              <div class="lc-col">1,000–3,000<br>吨/天</div>
-              <div class="lc-col">间歇辉光<br>无溢流</div>
-            </div>
-            <div class="lc-row" style="--stage-color: #c98a1a">
-              <div class="lc-col lc-stage"><span class="stage-label">过渡期<br>(+18至+22 天)</span></div>
-              <div class="lc-col">膨胀速率加快<br>1–2 μrad/天</div>
-              <div class="lc-col">脉冲加密<br>5–10 min/次</div>
-              <div class="lc-col">3,000–5,000<br>吨/天</div>
-              <div class="lc-col">持续辉光<br>偶发溢流</div>
-            </div>
-            <div class="lc-row" style="--stage-color: #e05d24">
-              <div class="lc-col lc-stage"><span class="stage-label">前驱溢流期<br>(+22至+28 天)</span></div>
-              <div class="lc-col">加速膨胀或<br>短暂转向回升</div>
-              <div class="lc-col">连续震颤<br>&lt;5 min/次</div>
-              <div class="lc-col">&gt;5,000<br>吨/天</div>
-              <div class="lc-col">频繁溢流<br>每天 10–75 次</div>
-            </div>
-            <div class="lc-row" style="--stage-color: #c43030">
-              <div class="lc-col lc-stage"><span class="stage-label">临发<br>(12–48 h)</span></div>
-              <div class="lc-col">急剧偏转<br>即时转升</div>
-              <div class="lc-col">震颤升<br>5–10 倍并持续</div>
-              <div class="lc-col">急剧升高<br>&gt;10,000</div>
-              <div class="lc-col">连续溢流<br>气体喷射</div>
-            </div>
-          </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 面板 3：喷发时间线与观测机会 -->
-      <div class="supplement-panel">
-        <button class="panel-trigger" onclick="togglePanel(this)">
-          <span class="panel-icon">▶</span>
-          <span class="panel-title">③ 喷发时间线 · 观测机会图</span>
-          <span class="panel-subtitle">前后 ±14 天，分时段观看指南</span>
-        </button>
-        <div class="panel-content">
-          <div class="panel-inner">
-          <!-- 横向时间轴：列=时段，行=观测类型 -->
-          <div class="obs-timeline">
-            <!-- 标题行 -->
-            <div class="otc otc-head otc-label"></div>
-            <div class="otc otc-head">−7 天</div>
-            <div class="otc otc-head">−3 天</div>
-            <div class="otc otc-head otc-erupt" style="color:var(--lava2)">喷发当天</div>
-            <div class="otc otc-head">+1 天</div>
-            <div class="otc otc-head">+3 天后</div>
-            <!-- 白天可见 -->
-            <div class="otc otc-label">白天可见</div>
-            <div class="otc">气柱，无喷泉</div>
-            <div class="otc">溢流/喷溅</div>
-            <div class="otc otc-erupt">熔岩喷泉</div>
-            <div class="otc">熔岩流红热</div>
-            <div class="otc">气柱消散</div>
-            <!-- 夜间可见 -->
-            <div class="otc otc-label">夜间可见</div>
-            <div class="otc">喷口辉光</div>
-            <div class="otc">辉光增强+气柱</div>
-            <div class="otc otc-erupt">橙红色火空</div>
-            <div class="otc">火口辉光明显</div>
-            <div class="otc">微弱辉光</div>
-            <!-- 推荐度 -->
-            <div class="otc otc-label">推荐度</div>
-            <div class="otc">★★ 一般</div>
-            <div class="otc">★★★ 值得</div>
-            <div class="otc otc-erupt" style="color:var(--lava2);font-weight:500">★★★★ 最佳</div>
-            <div class="otc">★★★★ 极佳（夜）</div>
-            <div class="otc">★★ 有限</div>
-          </div>
-          <div class="timeline-tips">
-            <div class="tip">每天查看 HVO 日报</div>
-            <div class="tip">避开 5–9pm 人流高峰</div>
-            <div class="tip">日出前或夜间到达</div>
-            <div class="tip">喷发结束后 1–2 夜景极佳</div>
-            <div class="tip">持续监控前驱信号</div>
-          </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 面板 4：历史喷发数据 -->
-      <div class="supplement-panel">
-        <button class="panel-trigger" onclick="togglePanel(this)">
-          <span class="panel-icon">▶</span>
-          <span class="panel-title">④ 历史喷发数据</span>
-          <span class="panel-subtitle">时长、间隔、规模参考</span>
-        </button>
-        <div class="panel-content">
-          <div class="panel-inner">
-          <div class="history-table">
-            <div class="hist-row hist-header">
-              <div class="hist-col">轮次</div>
-              <div class="hist-col">日期</div>
-              <div class="hist-col">时长</div>
-              <div class="hist-col">间隔</div>
-              <div class="hist-col">规模</div>
-              <div class="hist-col">备注</div>
-            </div>
-            <div class="hist-row"><div class="hist-col">第 38 次</div><div class="hist-col">12/6/25</div><div class="hist-col">&gt;12 小时</div><div class="hist-col">—</div><div class="hist-col">~1600 万 yd³</div><div class="hist-col">超大，摧毁 V3 摄像头</div></div>
-            <div class="hist-row"><div class="hist-col">第 39 次</div><div class="hist-col">12/24/25</div><div class="hist-col">5.9–8.5 小时</div><div class="hist-col">—</div><div class="hist-col">~1200 万 yd³</div><div class="hist-col">双喷口，大规模</div></div>
-            <div class="hist-row"><div class="hist-col">第 41 次</div><div class="hist-col">1/24/26</div><div class="hist-col">8 小时 18 分</div><div class="hist-col">—</div><div class="hist-col">~1400 万 yd³</div><div class="hist-col">双喷口，标志性大规模</div></div>
-            <div class="hist-row"><div class="hist-col">第 42 次</div><div class="hist-col">2/15/26</div><div class="hist-col">&lt;10 小时</div><div class="hist-col">22 天</div><div class="hist-col">中等</div><div class="hist-col">双喷口</div></div>
-            <div class="hist-row"><div class="hist-col">第 43 次</div><div class="hist-col">3/10/26</div><div class="hist-col">约 9 小时</div><div class="hist-col">23 天</div><div class="hist-col">~1600 万 yd³</div><div class="hist-col">双喷口，喷泉纪录 540m</div></div>
-            <div class="hist-row highlight"><div class="hist-col">第 44 次</div><div class="hist-col">4/9/26</div><div class="hist-col">8.5 小时</div><div class="hist-col">28 天</div><div class="hist-col">~750 万 yd³</div><div class="hist-col">单喷口，规模明显小</div></div>
-          </div>
-          <div class="history-summary">
-            <div class="summary-item"><span class="summary-label">近期均值（38–44 次）</span><span class="summary-value">~9.5 小时（收效趋势明显）</span></div>
-            <div class="summary-item"><span class="summary-label">典型间隔</span><span class="summary-value">22–28 天</span></div>
-            <div class="summary-item"><span class="summary-label">第 45 次窗口</span><span class="summary-value">4/20–4/25（距第 44 次 11–16 天）</span></div>
-          </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
+  <div class="footer" id="footer"></div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 <script>
-// ─────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────
-let CURRENT_DATA = null;
-let PREV_DATA = null;
-let chartInstance = null;
+// 完整数据内联
+const DATA = {
+  "report_date": "2026-04-30",
+  "data_source": "USGS HVO 2026-04-30",
+  "alert_level": "ADVISORY",
+  "aviation_code": "YELLOW",
+  "telemetry_status": "NORMAL",
+  "episode_window_badge": "May 5-9",
+  
+  "metrics": [
+    {
+      "title": "① 地倾斜 (Tilt)",
+      "status": "green",
+      "value": "累积 9.0 μrad",
+      "progress": 35,
+      "lines": ["Ep45后恢复速率: 4.3 μrad/day (↓38% vs历史)", "UWD & SDH 监测中"]
+    },
+    {
+      "title": "② 地震震颤 (Tremor)",
+      "status": "green",
+      "value": "标准脉冲",
+      "progress": 15,
+      "lines": ["间歇期: 5-15 min/次", "无异常迹象"]
+    },
+    {
+      "title": "③ SO₂ 排放",
+      "status": "green",
+      "value": "1-3 k t/d",
+      "progress": 20,
+      "lines": ["正常间歇期范围", "未见显著上升"]
+    },
+    {
+      "title": "④ 摄像头 & 前驱",
+      "status": "amber",
+      "value": "持续辉光",
+      "progress": 40,
+      "lines": ["南喷口: 持续辉光 + 偶发火焰", "北喷口: 间歇辉光"]
+    }
+  ],
 
-// ─────────────────────────────────────────────
-// KILAUEA FORECAST ENGINE
-// 由 metrics[3]（摄像头）+ episode_window_badge 自动生成概率曲线
-// ─────────────────────────────────────────────
-const STAGE = {
-  EARLY_INFLATION:      { key: 'early',     baseline: 0.15 },
-  ACTIVE_PRECURSORY:    { key: 'active',    baseline: 0.40 },
-  PRECURSORY_OVERFLOWS: { key: 'overflows', baseline: 0.65 },
-  IMMINENT:             { key: 'imminent',  baseline: 0.85 },
-  POST_ERUPTION:        { key: 'post',      baseline: 0.05 },
+  "stats": {
+    "hvo_window": "May 5-9 (推迟3天)",
+    "network_status": "SDH离线, UWD正常"
+  },
+
+  "chart": {
+    "data": [
+      {"date": "4/30", "prob": 2}, {"date": "5/1", "prob": 3}, {"date": "5/2", "prob": 5},
+      {"date": "5/3", "prob": 8}, {"date": "5/4", "prob": 15}, {"date": "5/5", "prob": 30},
+      {"date": "5/6", "prob": 45}, {"date": "5/7", "prob": 60}, {"date": "5/8", "prob": 72},
+      {"date": "5/9", "prob": 78}, {"date": "5/10", "prob": 75}, {"date": "5/11", "prob": 68},
+      {"date": "5/12", "prob": 58}, {"date": "5/13", "prob": 45}, {"date": "5/14", "prob": 32},
+      {"date": "5/15", "prob": 20}, {"date": "5/16", "prob": 12}, {"date": "5/17", "prob": 8},
+      {"date": "5/18", "prob": 5}, {"date": "5/19", "prob": 3}, {"date": "5/20", "prob": 2},
+      {"date": "5/21", "prob": 2}, {"date": "5/22", "prob": 2}, {"date": "5/23", "prob": 2},
+      {"date": "5/24", "prob": 2}, {"date": "5/25", "prob": 2}, {"date": "5/26", "prob": 2},
+      {"date": "5/27", "prob": 2}, {"date": "5/28", "prob": 2}, {"date": "5/29", "prob": 2}
+    ]
+  },
+
+  "travel_alert": {
+    "urgency": "watch",
+    "message": "当前处于HVO官方窗口期(5/5-5/9)。建议持续监控官方更新，准备在窗口前24小时赶往观测点。若5月9日未喷发，改进模型预测5月10-16日为次级高概率区(概率65-78%)。"
+  },
+
+  "footnote": "数据来源: USGS HVO · 最新日报: 2026-04-30 · 预测基于热态记忆效应模型 · 下次更新: 2026-05-01"
 };
 
-function detectStage(data) {
-  const metrics = data.metrics;
-  if (!metrics || metrics.length < 4) return STAGE.EARLY_INFLATION;
-
-  const sMap = { red: 1.0, amber: 0.6, green: 0.2 };
-  const sig = m => (sMap[m.status] || 0.3) * 0.5 + (m.progress / 100) * 0.5;
-
-  const cam = metrics[3];
-  const camText = [cam.value, ...(cam.lines || [])].join(' ').toLowerCase();
-  let camSig;
-  if (camText.includes('precursory overflows') || camText.includes('前驱溢流')) {
-    camSig = 0.95;
-  } else if (camText.includes('intense flaming') || camText.includes('剧烈持续火焰')) {
-    camSig = 0.85;
-  } else if ((camText.includes('辉光') || camText.includes('glow')) &&
-             (camText.includes('火焰') || camText.includes('flame'))) {
-    camSig = 0.70;
-  } else {
-    camSig = sig(cam);
-  }
-
-  const score = sig(metrics[0]) * 0.40
-              + sig(metrics[1]) * 0.25
-              + sig(metrics[2]) * 0.15
-              + camSig          * 0.20;
-
-  if (score > 0.82) return STAGE.IMMINENT;
-  if (score > 0.65) return STAGE.PRECURSORY_OVERFLOWS;
-  if (score > 0.45) return STAGE.ACTIVE_PRECURSORY;
-  return STAGE.EARLY_INFLATION;
-}
-
-function parseWindowBadge(badge, baseYear) {
-  if (!badge) return null;
-  const m = badge.match(/(\d+)\/(\d+)[–\-](\d+)\/(\d+)/);
-  if (!m) return null;
-  const start = new Date(baseYear, +m[1] - 1, +m[2]);
-  const end   = new Date(baseYear, +m[3] - 1, +m[4]);
-  if (end < start) end.setFullYear(end.getFullYear() + 1);
-  return { start, end };
-}
-
-function applyForecastEngine(data) {
-  // ✓ 安全检查：确保必要字段存在
-  if (!data) {
-    console.error('applyForecastEngine: data is null');
-    return;
-  }
-  if (!data.metrics || !Array.isArray(data.metrics)) {
-    console.error('applyForecastEngine: invalid metrics array');
-    return;
-  }
-  if (!data.chart) {
-    console.warn('applyForecastEngine: initializing empty chart object');
-    data.chart = { data: [] };
-  }
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const year = today.getFullYear();
-
-  const stage  = detectStage(data);
-  const win    = parseWindowBadge(data.episode_window_badge, year);
-  const telem  = data.telemetry_status || 'NORMAL';
-  
-  // ✓ 修复：确保 win 和 winWidth 安全计算
-  const winWidth = (win && win.start && win.end) 
-    ? Math.max(1, Math.round((win.end - win.start) / 86400000) + 1) 
-    : 7;
-
-  const baseConf  = ({ NORMAL: 0.80, PARTIAL: 0.65, OUTAGE: 0.45 })[telem] || 0.70;
-  const winBonus  = Math.max(0, (14 - winWidth) / 14) * 0.15;
-  const confFac   = ({ early:0.80, active:0.85, overflows:0.90, imminent:0.95, post:0.60 })[stage.key] || 0.75;
-  const globalConf = Math.min(0.95, (baseConf + winBonus) * confFac);
-
-  const rows = [];
-  let wStartIdx = null, wEndIdx = null;
-
-  for (let i = 0; i < 30; i++) {
-    const day = new Date(today);
-    day.setDate(today.getDate() + i);
-    const dateStr = `${day.getMonth() + 1}/${day.getDate()}`;
-
-    let prob;
-    if (win && day >= win.start && day <= win.end) {
-      if (wStartIdx === null) wStartIdx = i;
-      wEndIdx = i;
-      const offset = Math.round((day - win.start) / 86400000);
-      const half   = winWidth / 2;
-      prob = offset < half
-        ? 0.70 + (offset / half) * 0.18
-        : 0.88 - ((offset - half) / half) * 0.23;
-    } else if (win) {
-      const distDays = Math.min(
-        Math.abs(day - win.start),
-        Math.abs(day - win.end)
-      ) / 86400000;
-      prob = Math.max(0.10, 0.70 * Math.exp(-distDays / 3.5));
-    } else {
-      prob = Math.max(0.10, 0.30 - i * 0.007);
-    }
-
-    prob *= stage.baseline / 0.40;
-    prob  = Math.min(0.95, Math.max(0.05, prob));
-
-    const dayConf = Math.max(10, Math.round(globalConf * (1 - i * 0.018) * 100));
-
-    rows.push({ date: dateStr, probability: Math.round(prob * 100), confidence: dayConf });
-  }
-
-  // ✓ 安全赋值
-  data.chart.data = rows;
-  if (wStartIdx !== null) {
-    data.chart.hvo_window = { start_index: wStartIdx, end_index: wEndIdx, label: 'HVO官方窗口' };
-  }
-}
-
-// ─────────────────────────────────────────────
-// FETCH
-// ─────────────────────────────────────────────
-async function fetchData() {
-  const res = await fetch('./data.json?t=' + Date.now());
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
-}
-
-async function refreshData() {
-  const btn = document.getElementById('refresh-btn');
-  const icon = document.getElementById('refresh-icon');
-  const label = document.getElementById('refresh-label');
-
-  btn.disabled = true;
-  icon.classList.add('spinning');
-  label.textContent = '获取中…';
-
+function init() {
   try {
-    let newData;
-    try {
-      const res = await fetch('/api/refresh', { method: 'POST' });
-      if (!res.ok) throw new Error('API ' + res.status);
-      newData = await res.json();
-      if (newData.error) throw new Error(newData.error);
-    } catch (apiErr) {
-      console.warn('API 不可用，降级读取本地文件：', apiErr.message);
-      newData = await fetchData();
+    // 徽章
+    let badgesHtml = '';
+    if (DATA.alert_level) badgesHtml += `<span class="badge badge-advisory">${DATA.alert_level}</span>`;
+    if (DATA.aviation_code) badgesHtml += `<span class="badge badge-yellow">航空 ${DATA.aviation_code}</span>`;
+    if (DATA.telemetry_status) badgesHtml += `<span class="badge badge-normal">${DATA.telemetry_status === 'NORMAL' ? '遥测正常' : '遥测异常'}</span>`;
+    if (DATA.episode_window_badge) badgesHtml += `<span class="badge badge-window">${DATA.episode_window_badge}</span>`;
+    document.getElementById('badges').innerHTML = badgesHtml;
+
+    let html = '';
+
+    // 监测指标
+    html += '<div class="section-title">监测指标</div>';
+    html += '<div class="grid">';
+    DATA.metrics.forEach(m => {
+      const color = { 'green': '#2a7a4a', 'amber': '#c98a1a', 'red': '#c43030' }[m.status] || '#666';
+      html += `<div class="card" style="border-top: 2px solid ${color}">
+        <div class="card-title">${m.title}</div>
+        <div class="card-value">${m.value}</div>
+        <div style="height: 3px; background: ${color}; border-radius: 2px; width: ${m.progress}%; margin: 6px 0;"></div>
+        ${m.lines.map(l => `<div class="card-text">${l}</div>`).join('')}
+      </div>`;
+    });
+    html += '</div>';
+
+    // 关键数据
+    html += '<div class="section-title">关键数据</div>';
+    html += '<div class="grid">';
+    html += `<div class="card"><div class="card-title">HVO 官方窗口</div><div class="card-value">${DATA.stats.hvo_window}</div></div>`;
+    html += `<div class="card"><div class="card-title">监测网络</div><div class="card-value" style="font-size: 14px;">${DATA.stats.network_status}</div></div>`;
+    html += '</div>';
+
+    // 图表
+    if (DATA.chart.data && DATA.chart.data.length > 0) {
+      html += '<div class="section-title">30天预测概率</div>';
+      html += '<div class="chart-section"><canvas id="chart"></canvas></div>';
     }
-    const changes = CURRENT_DATA ? diffData(CURRENT_DATA, newData) : [];
 
-    PREV_DATA = CURRENT_DATA;
-    CURRENT_DATA = newData;
+    document.getElementById('content').innerHTML = html;
 
-    applyForecastEngine(newData);
-    renderAll(newData);
-    if (changes.length > 0) highlightChanges(changes);
-
-    const now = new Date();
-    document.getElementById('last-updated').textContent =
-      '更新于 ' + now.getHours().toString().padStart(2,'0') + ':' +
-      now.getMinutes().toString().padStart(2,'0');
-
-    if (PREV_DATA) {
-      showToast(changes.length > 0 ? `发现 ${changes.length} 项变化` : '数据已是最新', changes.length > 0 ? 'success' : '');
-    }
-  } catch (e) {
-    console.error('Refresh error:', e);
-    showToast('获取失败：' + e.message, 'error');
-  } finally {
-    btn.disabled = false;
-    icon.classList.remove('spinning');
-    label.textContent = '刷新数据';
-  }
-}
-
-// ─────────────────────────────────────────────
-// DIFF
-// ─────────────────────────────────────────────
-function diffData(old, nw) {
-  const changes = [];
-  if (old.alert_level !== nw.alert_level)
-    changes.push('alert_level');
-  if (old.episode_window_badge !== nw.episode_window_badge)
-    changes.push('window_badge');
-  if (old.travel_alert.urgency !== nw.travel_alert.urgency)
-    changes.push('travel_alert');
-  old.metrics.forEach((m, i) => {
-    if (m.status !== nw.metrics[i].status || m.value !== nw.metrics[i].value)
-      changes.push('metric-card-' + i);
-  });
-  return changes;
-}
-
-function highlightChanges(fields) {
-  fields.forEach(f => {
-    const el = document.getElementById(f);
-    if (!el) return;
-    el.classList.remove('just-updated');
-    void el.offsetWidth;
-    el.classList.add('just-updated');
-    setTimeout(() => el.classList.remove('just-updated'), 2500);
-  });
-}
-
-// ─────────────────────────────────────────────
-// RENDER: ALL
-// ─────────────────────────────────────────────
-function renderAll(data) {
-  renderHeader(data);
-  renderMetrics(data.metrics);
-  renderChart(data.chart);
-  renderStats(data);
-  renderTravelAlert(data.travel_alert);
-  renderChangeAlert(data.change_alert);
-  renderFootnote(data.footnote);
-}
-
-// ─────────────────────────────────────────────
-// RENDER: HEADER
-// ─────────────────────────────────────────────
-function renderHeader(data) {
-  document.getElementById('data-source-text').textContent = data.data_source || '数据源';
-  document.getElementById('source-link').href = data.source_url || '#';
-
-  const levelClass = {
-    'ADVISORY': 'badge-advisory',
-    'WATCH':    'badge-watch',
-    'WARNING':  'badge-warning'
-  }[data.alert_level] || 'badge-advisory';
-
-  const avClass = {
-    'YELLOW': 'badge-yellow',
-    'ORANGE': 'badge-orange',
-    'RED':    'badge-red'
-  }[data.aviation_code] || 'badge-yellow';
-
-  const telClass = {
-    'NORMAL':  'badge-normal',
-    'PARTIAL': 'badge-partial',
-    'OUTAGE':  'badge-outage'
-  }[data.telemetry_status] || 'badge-normal';
-
-  const telLabel = {
-    'NORMAL':  '遥测正常',
-    'PARTIAL': '遥测部分',
-    'OUTAGE':  '遥测中断'
-  }[data.telemetry_status] || '遥测正常';
-
-  let html = `
-    <span id="alert_level" class="badge ${levelClass}">${data.alert_level || 'ADVISORY'}</span>
-    <span class="badge ${avClass}">航空 ${data.aviation_code || 'YELLOW'}</span>
-    <span class="badge ${telClass}">${telLabel}</span>
-  `;
-  if (data.episode_window_badge) {
-    html += `<span id="window_badge" class="badge badge-window">${data.episode_window_badge}</span>`;
-  }
-  document.getElementById('badges-container').innerHTML = html;
-
-  if (!document.getElementById('last-updated').textContent) {
-    const t = (data.data_source || '').match(/(\d+:\d+\s+\w+)/);
-    document.getElementById('last-updated').textContent = t ? '来源时间 ' + t[1] : '';
-  }
-}
-
-// ─────────────────────────────────────────────
-// RENDER: METRICS
-// ─────────────────────────────────────────────
-function renderMetrics(metrics) {
-  const grid = document.getElementById('metrics-grid');
-  if (!metrics) { grid.innerHTML = ''; return; }
-  
-  grid.innerHTML = metrics.map((m, i) => {
-    const dotClass = m.status || 'green';
-    const redLineIndex = m.id === 4 && m.status === 'red' ? 0 : -1;
-    const linesHtml = (m.lines || []).map((l, li) =>
-      `<div class="metric-line${li === redLineIndex ? ' highlight' : ''}">${l}</div>`
-    ).join('');
-
-    return `
-      <div class="metric-card status-${m.status || 'green'}" id="metric-card-${i}" data-field="metric-card-${i}">
-        <div class="metric-header">
-          <div class="status-dot ${dotClass}"></div>
-          <div class="metric-title">${m.title || ''}</div>
-        </div>
-        <div class="metric-value">${m.value || '—'}</div>
-        <div class="metric-progress-track">
-          <div class="metric-progress-fill" style="width:${m.progress || 0}%"></div>
-        </div>
-        <div class="metric-lines">${linesHtml}</div>
-      </div>
+    // 出行建议
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${DATA.travel_alert.urgency}`;
+    alertDiv.innerHTML = `
+      <div class="alert-icon">◈</div>
+      <div class="alert-message">${DATA.travel_alert.message}</div>
     `;
-  }).join('');
+    document.getElementById('content').appendChild(alertDiv);
+
+    // 页脚
+    document.getElementById('footer').textContent = DATA.footnote;
+
+    // 绘制图表
+    if (DATA.chart.data && DATA.chart.data.length > 0) {
+      requestAnimationFrame(drawChart);
+    }
+
+    console.log('✓ 初始化成功');
+  } catch (e) {
+    console.error('❌ 错误:', e);
+    document.getElementById('content').innerHTML = `<div style="color: #d84040; padding: 20px;">初始化失败: ${e.message}</div>`;
+  }
 }
 
-// ─────────────────────────────────────────────
-// RENDER: CHANGE ALERT
-// ─────────────────────────────────────────────
-function renderChangeAlert(alert) {
-  const container = document.getElementById('change-alert-container');
-  if (!alert || !alert.has_changes) { container.innerHTML = ''; return; }
+function drawChart() {
+  const canvas = document.getElementById('chart');
+  if (!canvas) return;
 
-  const itemsHtml = (alert.items || []).map(item => `
-    <div class="change-item">
-      <span class="change-icon">${item.icon || '→'}</span>
-      <span><span class="change-highlight">${item.highlight || ''}</span>：${item.detail || ''}</span>
-    </div>
-  `).join('');
+  const ctx = canvas.getContext('2d');
+  const data = DATA.chart.data;
+  
+  canvas.width = Math.min(canvas.parentElement.offsetWidth - 40, 900);
+  canvas.height = 200;
 
-  container.innerHTML = `
-    <div class="change-alert" id="change-alert">
-      <div class="change-alert-title">⚡ 今日重要变化（vs 昨日）</div>
-      <div class="change-items">${itemsHtml}</div>
-    </div>
-  `;
-}
+  const padding = 35;
+  const width = canvas.width - padding * 2;
+  const height = canvas.height - padding - 20;
+  const barWidth = Math.max(width / data.length - 2, 2);
 
-// ─────────────────────────────────────────────
-// RENDER: CHART
-// ─────────────────────────────────────────────
-function renderChart(cfg) {
-  const labels  = (cfg.data || []).map(d => d.date);
-  const probs   = (cfg.data || []).map(d => d.probability);
-  const confs   = (cfg.data || []).map(d => d.confidence);
-  const barColors = (probs || []).map(p =>
-    p >= 50 ? '#c43030' : p >= 20 ? '#BA7517' : '#1D9E75'
-  );
+  // 背景
+  ctx.fillStyle = '#0d0e0f';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const ctx = document.getElementById('main-chart');
-  if (chartInstance) { chartInstance.destroy(); }
+  // 轴
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, height + padding);
+  ctx.lineTo(padding, padding);
+  ctx.lineTo(canvas.width - padding, padding);
+  ctx.stroke();
 
-  chartInstance = new Chart(ctx, {
-    data: {
-      labels,
-      datasets: [
-        {
-          type: 'bar',
-          label: '喷发概率 (%)',
-          data: probs,
-          backgroundColor: barColors,
-          borderRadius: 2,
-          borderSkipped: false,
-          yAxisID: 'yLeft',
-          order: 2
-        },
-        {
-          type: 'line',
-          label: '置信度 (%)',
-          data: confs,
-          borderColor: '#7a6fd0',
-          backgroundColor: 'rgba(122,111,208,0.06)',
-          borderWidth: 1.5,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          tension: 0.4,
-          fill: true,
-          yAxisID: 'yRight',
-          order: 1
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a1b1d',
-          borderColor: 'rgba(255,255,255,0.1)',
-          borderWidth: 1,
-          titleFont: { family: 'Space Mono', size: 11 },
-          bodyFont: { family: 'Space Mono', size: 10 },
-          titleColor: '#e8e6e0',
-          bodyColor: '#8a8680',
-          callbacks: {
-            title: ctx => {
-              if (!ctx || ctx.length === 0) return '';
-              const idx = ctx[0].dataIndex;
-              const lbl = ctx[0].label + ' 日';
-              const w = cfg.hvo_window;
-              if (w && idx >= w.start_index && idx <= w.end_index)
-                return lbl + '  ★ HVO官方窗口';
-              return lbl;
-            },
-            label: ctx => {
-              if (ctx.datasetIndex === 0) return ' 喷发概率  ' + ctx.raw + '%';
-              return ' 置信度    ' + ctx.raw + '%';
-            }
-          }
-        }
-      },
-      scales: {
-        yLeft: {
-          type: 'linear', position: 'left', beginAtZero: true, max: 100,
-          title: { display: true, text: '概率 %', color: '#5a5854', font: { family: 'Space Mono', size: 10 } },
-          ticks: { color: '#5a5854', font: { family: 'Space Mono', size: 9 }, callback: v => v + '%' },
-          grid: { color: 'rgba(255,255,255,0.04)' }
-        },
-        yRight: {
-          type: 'linear', position: 'right', beginAtZero: true, max: 100,
-          title: { display: true, text: '置信度 %', color: '#7a6fd0', font: { family: 'Space Mono', size: 10 } },
-          ticks: { color: '#7a6fd0', font: { family: 'Space Mono', size: 9 }, callback: v => v + '%' },
-          grid: { drawOnChartArea: false }
-        },
-        x: {
-          ticks: {
-            color: '#5a5854', font: { family: 'Space Mono', size: 9 },
-            autoSkip: false, maxRotation: 50,
-            callback(val, idx) {
-              const lbl = this.getLabelForValue(val);
-              const w = cfg.hvo_window;
-              if (w && idx >= w.start_index && idx <= w.end_index) return '★' + lbl;
-              return idx % 3 === 0 ? lbl : '';
-            }
-          },
-          grid: { display: false }
-        }
-      }
-    },
-    plugins: [{
-      id: 'hvoWindow',
-      beforeDraw(chart) {
-        const { ctx, chartArea, scales } = chart;
-        if (!chartArea || !cfg.hvo_window) return;
-        const w = cfg.hvo_window;
-        const x0 = scales.x.getPixelForValue(w.start_index);
-        const x1 = scales.x.getPixelForValue(w.end_index);
-        const bw = scales.x.getPixelForValue(1) - scales.x.getPixelForValue(0);
-        ctx.save();
-        ctx.fillStyle = 'rgba(196,48,48,0.07)';
-        ctx.fillRect(x0 - bw * 0.5, chartArea.top, x1 - x0 + bw, chartArea.height);
-        ctx.strokeStyle = 'rgba(196,48,48,0.25)';
-        ctx.lineWidth = 0.5;
-        ctx.setLineDash([4, 3]);
-        ctx.strokeRect(x0 - bw * 0.5, chartArea.top, x1 - x0 + bw, chartArea.height);
-        ctx.restore();
-      }
-    }]
+  // 柱子
+  data.forEach((d, i) => {
+    const prob = d.prob || 0;
+    const x = padding + i * (barWidth + 2);
+    const barHeight = (prob / 100) * height;
+    const y = height + padding - barHeight;
+
+    let color = '#1D9E75';
+    if (prob >= 50) color = '#c43030';
+    else if (prob >= 20) color = '#BA7517';
+
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, barWidth, barHeight);
+  });
+
+  // 标签
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '9px sans-serif';
+  ctx.textAlign = 'center';
+  data.forEach((d, i) => {
+    if (i % 5 === 0) {
+      const x = padding + i * (barWidth + 2) + barWidth / 2;
+      ctx.fillText(d.date, x, canvas.height - 5);
+    }
   });
 }
 
-// ─────────────────────────────────────────────
-// RENDER: STATS
-// ─────────────────────────────────────────────
-function renderStats(data) {
-  const stats = data.stats || {};
-
-  const LAST_ERUPTION = new Date(2026, 3, 9);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const daysSinceLast = Math.floor((today - LAST_ERUPTION) / 86400000);
-
-  const win = parseWindowBadge(data.episode_window_badge, today.getFullYear());
-  const daysToWindow = win
-    ? (today >= win.start ? 0 : Math.floor((win.start - today) / 86400000))
-    : null;
-
-  const cards = [
-    { label: 'HVO 官方窗口',  value: stats.hvo_window || '——',     sub: '第46次喷发',           highlight: !!stats.hvo_window },
-    { label: '间歇第几天',    value: '第 ' + daysSinceLast + ' 天', sub: '自第45次喷发结束',    highlight: false },
-    { label: '窗口倒计时',    value: daysToWindow != null ? daysToWindow + ' 天' : '——', sub: '距官方窗口开启', highlight: daysToWindow !== null && daysToWindow <= 3 },
-    { label: '监测网络',      value: stats.network_status || '正常',            sub: 'SDH 仍离线除外',       highlight: false }
-  ];
-
-  document.getElementById('stats-row').innerHTML = cards.map(c => `
-    <div class="stat-card">
-      <div class="stat-label">${c.label}</div>
-      <div class="stat-value${c.highlight ? ' highlight' : ''}">${c.value}</div>
-      <div class="stat-sub">${c.sub}</div>
-    </div>
-  `).join('');
+function togglePanel(button) {
+  button.closest('.panel').classList.toggle('open');
 }
 
-// ─────────────────────────────────────────────
-// RENDER: TRAVEL ALERT
-// ─────────────────────────────────────────────
-function renderTravelAlert(alert) {
-  if (!alert) { document.getElementById('travel-alert-container').innerHTML = ''; return; }
-  
-  const icons   = { watch: '◈', prepare: '◉', go_now: '⬤' };
-  const titles  = { watch: '持续观望', prepare: '准备出发', go_now: '尽快出发 / 优先前往' };
-
-  document.getElementById('travel-alert-container').innerHTML = `
-    <div class="travel-alert ${alert.urgency || 'watch'}" id="travel_alert">
-      <div class="travel-icon">${icons[alert.urgency || 'watch'] || '◈'}</div>
-      <div class="travel-content">
-        <div class="travel-title">${titles[alert.urgency || 'watch'] || ''}</div>
-        <div class="travel-message">${alert.message || ''}</div>
-      </div>
-    </div>
-  `;
-}
-
-// ─────────────────────────────────────────────
-// RENDER: FOOTNOTE
-// ─────────────────────────────────────────────
-function renderFootnote(text) {
-  if (!text) return;
-  document.getElementById('footnote').textContent = text;
-}
-
-// ─────────────────────────────────────────────
-// TOAST
-// ─────────────────────────────────────────────
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
-}
-
-// ─────────────────────────────────────────────
-// INIT (修复版)
-// ─────────────────────────────────────────────
-(async () => {
-  try {
-    console.log('📡 Loading data.json...');
-    const data = await fetchData();
-    
-    // ✓ 验证数据格式
-    if (!data) {
-      throw new Error('data.json is empty or invalid');
-    }
-    if (!data.metrics || !Array.isArray(data.metrics)) {
-      throw new Error('Invalid metrics array in data.json');
-    }
-    if (!data.chart) {
-      console.warn('⚠️ Initializing empty chart object');
-      data.chart = { data: [] };
-    }
-    if (!data.travel_alert) {
-      data.travel_alert = { urgency: 'watch', message: '暂无出行建议' };
-    }
-    if (!data.change_alert) {
-      data.change_alert = { has_changes: false, items: [] };
-    }
-    
-    CURRENT_DATA = data;
-    console.log('✓ Data loaded successfully:', data);
-    console.log('🔄 Applying forecast engine...');
-    applyForecastEngine(data);
-    console.log('✓ Forecast engine applied');
-    console.log('🎨 Rendering UI...');
-    renderAll(data);
-    console.log('✓ Page initialized successfully');
-  } catch(e) {
-    console.error('❌ Initialization error:', e);
-    showToast('初始化失败：' + e.message, 'error');
-    document.querySelector('.container').innerHTML +=
-      `<div style="color:#d84040;font-family:monospace;padding:40px 0">
-        <div>✗ 无法初始化页面</div>
-        <div style="margin-top:10px;font-size:12px;color:#8a8680">
-          错误：${e.message}<br>
-          请确认 data.json 存在且有效。<br>
-          在浏览器控制台（F12）查看完整错误。
-        </div>
-       </div>`;
-  }
-})();
-
-function togglePanel(btn) {
-  btn.closest('.supplement-panel').classList.toggle('open');
-}
-
+// 启动
+window.addEventListener('load', init);
+if (document.readyState !== 'loading') init();
 </script>
+
 </body>
 </html>
